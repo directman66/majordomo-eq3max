@@ -241,7 +241,7 @@ debmes('Закрыли сокет, обмен закончен', 'eq3max');
 	$total=count( $buff);
          for ($i=0;$i<$total;$i++) {
         $this->parsing($buff[$i]);
-echo $i.":".$buff[$i]."<hr>";
+//echo $i.":".$buff[$i]."<hr>";
 				    }
 
 
@@ -255,7 +255,7 @@ echo $i.":".$buff[$i]."<hr>";
 
 function parsing ($buf){
 
-echo     $buf ."<br><br>";
+//echo     $buf ."<br><br>";
 debmes($buf[0]."-------------",'eq3max');
 debmes($buf,'eq3max');
 
@@ -544,7 +544,7 @@ debmes('C:DeviceType:'.$hilf["DeviceType"], 'eq3max');
 	$rec['ROOMID']=$hilf["?RoomId"];
 	$rec['SERIALNUMBER']=$hilf["SerialNumber"];
 	$rec['DEVICETYPE']=$hilf["DeviceType"];
-
+/*
 	if ($rec['ID']) {
 	SQLUpdate('eq3max_devices', $rec);
 	} else 
@@ -552,9 +552,11 @@ debmes('C:DeviceType:'.$hilf["DeviceType"], 'eq3max');
 	SQLInsert('eq3max_devices', $rec);
 	}
 
+*/
+
 //debmes('C:data_ecnode:'.$dataenc, 'eq3max');
 
-/*
+
     switch($hilf["DeviceType"]){
       case "0":
 	debmes('C:DeviceType:Cube', 'eq3max');
@@ -610,10 +612,10 @@ debmes('C:DeviceType:'.$hilf["DeviceType"], 'eq3max');
 //      dembes("cubec?E:".$this->retarr["cube"]["c?E"], 'eq3max');
     break;
      
-    case "1":
-   	  break;
+//    case "1":
+//   	  break;
    	 
-    case "2":
+    case "1":
       // Thermostat
       debmes('C:DeviceType:Thermostat', 'eq3max');
       $key = array_search($hilf["RFAdress"], array_column($this->retarr["devc"], 'mRFAdress'));
@@ -626,46 +628,82 @@ debmes('C:DeviceType:'.$hilf["DeviceType"], 'eq3max');
       $this->retarr["devc"][$key]["c?DataLength"] = $hilf["?1"];
 
       $this->retarr["devc"][$key]["cRFAdress"] = $hilf["RFAdress"];
-      dembes("devc".$key."cRFAdress:".      $this->retarr["devc"][$key]["cRFAdress"], 'eq3max');
+      debmes("devc".$key."cRFAdress:".      $this->retarr["devc"][$key]["cRFAdress"], 'eq3max');
 
       $this->retarr["devc"][$key]["cDeviceType"] = $hilf["DeviceType"];
-      dembes("devc".$key."DeviceType:".      $this->retarr["devc"][$key]["DeviceType"], 'eq3max');
+      debmes("devc".$key."DeviceType:".      $this->retarr["devc"][$key]["DeviceType"], 'eq3max');
 
       $this->retarr["devc"][$key]["c?2"] = $hilf["?2"];
+      debmes("devc".$key."c?2:".      $this->retarr["devc"][$key]["c?2"], 'eq3max');
+
       $this->retarr["devc"][$key]["c?RoomId"] = $hilf["?RoomId"];
+      debmes("devc".$key."RoomId:".      $this->retarr["devc"][$key]["c?RoomId"], 'eq3max');
+
       $this->retarr["devc"][$key]["c?FirmwareVersion"] = $hilf["?FirmwareVersion"];
+      debmes("devc".$key."FirmwareVersion:".      $this->retarr["devc"][$key]["c?FirmwareVersion"], 'eq3max');
+
       $this->retarr["devc"][$key]["c?NumModus"] = $hilf["?NumModus"];
+      debmes("devc".$key."NumModus:".      $this->retarr["devc"][$key]["c?NumModus"], 'eq3max');
+
       $this->retarr["devc"][$key]["cSerialNumber"] = $hilf["SerialNumber"];
-      dembes("devc".$key."SerialNumber:".      $this->retarr["devc"][$key]["SerialNumber"], 'eq3max');
+      debmes("devc".$key."SerialNumber:".      $this->retarr["devc"][$key]["SerialNumber"], 'eq3max');
 
       $this->retarr["devc"][$key]["cComfortTemperature"] = ($this->ord2str($str, 1) /2) ;
-      dembes("devc".$key."cComfortTemperature:".      $this->retarr["devc"][$key]["cComfortTemperature"], 'eq3max');
+      debmes("devc".$key."cComfortTemperature:".      $this->retarr["devc"][$key]["cComfortTemperature"], 'eq3max');
+	$rec['COMFORTTEMP']=$this->retarr["devc"][$key]["cComfortTemperature"];
 
       $this->retarr["devc"][$key]["cEcoTemperature"] = ($this->ord2str($str, 1) /2) ;
-      dembes("devc".$key."cEcoTemperature:".      $this->retarr["devc"][$key]["cEcoTemperature"], 'eq3max');
+      debmes("devc".$key."cEcoTemperature:".      $this->retarr["devc"][$key]["cEcoTemperature"], 'eq3max');
+	$rec['ECOTEMP']=$this->retarr["devc"][$key]["cEcoTemperature"];
 
       $this->retarr["devc"][$key]["cMaxSetPointTemperature"] = ($this->ord2str($str, 1) /2) ;
-      dembes("devc".$key."cEcoTemperature:".      $this->retarr["devc"][$key]["cEcoTemperature"], 'eq3max');
+      debmes("devc".$key."cMaxSetPointTemperature:".      $this->retarr["devc"][$key]["cMaxSetPointTemperature"], 'eq3max');
+	$rec['MAXSETPOINTTEMP']=$this->retarr["devc"][$key]["cMaxSetPointTemperature"];
 
       $this->retarr["devc"][$key]["cMinSetPointTemperature"] = ($this->ord2str($str, 1) /2) ;
-      dembes("devc".$key."cMinSetPointTemperature:".      $this->retarr["devc"][$key]["cMinSetPointTemperature"], 'eq3max');
+      debmes("devc".$key."cMinSetPointTemperature:".      $this->retarr["devc"][$key]["cMinSetPointTemperature"], 'eq3max');
+	$rec['MINSETPOINTTEMP']=$this->retarr["devc"][$key]["cMinSetPointTemperature"];
 
 
       $this->retarr["devc"][$key]["cTemperatureOffse"] = ($this->ord2str($str, 1) /2) -3.5 ;
-      dembes("devc".$key."cTemperatureOffse:".      $this->retarr["devc"][$key]["cTemperatureOffse"], 'eq3max');
+      debmes("devc".$key."cTemperatureOffse:".      $this->retarr["devc"][$key]["cTemperatureOffse"], 'eq3max');
+
 
       $this->retarr["devc"][$key]["cWindowOpenTemperature"] = ($this->ord2str($str, 1) /2) ;
-      dembes("devc".$key."cWindowOpenTemperature:".      $this->retarr["devc"][$key]["cWindowOpenTemperature"], 'eq3max');
+      debmes("devc".$key."cWindowOpenTemperature:".      $this->retarr["devc"][$key]["cWindowOpenTemperature"], 'eq3max');
+	$rec['WINDOWOPENTEMP']=$this->retarr["devc"][$key]["cWindowOpenTemperature"];
 
       $this->retarr["devc"][$key]["cWindowOpenDuration"] = $this->dechex2str($str, 1);
-      $this->retarr["devc"][$key]["cBoost"] = $this->strpaddecbin2str($str,1,8);
+      debmes("devc".$key."cWindowOpenDuration:".      $this->retarr["devc"][$key]["cWindowOpenDuration"], 'eq3max');
+	$rec['WINDOWOPENDURATION']=$this->retarr["devc"][$key]["cWindowOpenDuration"];
+
+     $this->retarr["devc"][$key]["cBoost"] = $this->strpaddecbin2str($str,1,8);
+      debmes("devc".$key."cBoost:".      $this->retarr["devc"][$key]["cBoost"], 'eq3max');
+	$rec['BOOST']=$this->retarr["devc"][$key]["cBoost"];
+
+
       $this->retarr["devc"][$key]["cBoostDuration"] = bindec(substr($this->retarr["devc"][$key]["cBoost"],0,3))*5;
+      debmes("devc".$key."cBoostDuration:".      $this->retarr["devc"][$key]["cBoostDuration"], 'eq3max');
+	$rec['BOOSTDURATION']=$this->retarr["devc"][$key]["cBoostDuration"];
+
       $this->retarr["devc"][$key]["cBoostValue"] = bindec(substr($this->retarr["devc"][$key]["cBoost"],3,5))*5;
+      debmes("devc".$key."cBoostValue:".      $this->retarr["devc"][$key]["cBoostValue"], 'eq3max');
+	$rec['BOOSTVALUE']=$this->retarr["devc"][$key]["cBoostValue"];
+
       $this->retarr["devc"][$key]["cDecalc"] = $this->strpaddecbin2str($str,1,8);
+      debmes("devc".$key."cDecalc:".      $this->retarr["devc"][$key]["cDecalc"], 'eq3max');
+	$rec['DECALC']=$this->retarr["devc"][$key]["DECALC"];
+
       $readlen =  1; $this->retarr["devc"][$key]["cDecalcDay"] = bindec(substr($this->retarr["devc"][$key]["cDecalc"],0,3));
       $readlen =  1; $this->retarr["devc"][$key]["cDecalcTime"] = bindec(substr($this->retarr["devc"][$key]["cDecalc"],3,5));
       $this->retarr["devc"][$key]["cMaximumValveSetting"] = $this->dechex2str($str, 1) *(100/255);
+      debmes("devc".$key."cMaximumValveSetting:".      $this->retarr["devc"][$key]["cMaximumValveSetting"], 'eq3max');
+	$rec['MAXVALVESETING']=$this->retarr["devc"][$key]["cMaximumValveSetting"];
+
+
       $this->retarr["devc"][$key]["cValveOffset"] = $this->dechex2str($str, 1) *(100/255);
+      debmes("devc".$key."cValveOffset:".      $this->retarr["devc"][$key]["cValveOffset"], 'eq3max');
+	$rec['VALVEOFFSET']=$this->retarr["devc"][$key]["cValveOffset"];
       
       for ($j = 1 ; $j <= 7 ; $j++) {
         $readlen = 26;// Sat, Sun, Mon, Tue, Weg, Thu, Fri
@@ -697,8 +735,14 @@ debmes('C:DeviceType:'.$hilf["DeviceType"], 'eq3max');
       // Other
       break;
     }	
-*/
 
+
+	if ($rec['ID']) {
+	SQLUpdate('eq3max_devices', $rec);
+	} else 
+	{
+	SQLInsert('eq3max_devices', $rec);
+	}
 
 
 
@@ -848,7 +892,7 @@ socket_sendto($cs, $str, strlen($str), 0, $ip, $port);
 
 			if($buf != NULL){
 
-echo $buf;
+//echo $buf;
 
 if ($ip) {
 
@@ -914,7 +958,7 @@ $total = count($commands);
 
 }
 
- function edit_eq3max_devices(&$out, $id) {
+  function edit_eq3max_devices(&$out, $id) {
   require(DIR_MODULES.$this->name.'/eq3max_devices_edit.inc.php');
  }
 
@@ -1005,10 +1049,26 @@ function set_favorit($id, $color) {
  eq3max_devices: TITLE varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: RFADDRESS varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: DEVICETYPE varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: DEVICETYPETEXT varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: SERIALNUMBER varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: DEVICENAME varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: ROOMID varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: FIRMWARE varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: ECOTEMP varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: MINSETPOINTTEMP varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: MAXSETPOINTTEMP varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: COMFORTTEMP varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: WINDOWOPENTEMP varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: WINDOWOPENDURATION varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: BOOST varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: BOOSTVALUE varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: BOOSTDURATION varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: DECALC varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: MAXVALVESETING varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: VALVEOFFSET varchar(100) NOT NULL DEFAULT ''
+
+
+
 
 
 EOD;
