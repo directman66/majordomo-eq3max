@@ -1,4 +1,45 @@
+<!-- table zwave_devices search -->
+
+
+
 <div>
+
+<a href="https://www.eq-3.com/products/max.html"> 
+<img src="/img/modules/eq3logo.png" width="100"  > 
+</a>
+
+ <a class="btn btn-default" href="#" onClick="$('#api_settings').toggle();return false;"><#LANG_SETUP#></a>
+
+&nbsp;&nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp; &nbsp;&nbsp;
+ &nbsp;&nbsp;<a class="btn btn-default" href="?data_source=<#DATA_SOURCE#>&view_mode=get&tab=info">GET</a>
+
+</div>
+
+<div style="display:none" id='api_settings'>
+&nbsp;
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+<fieldset>
+<div class="form-group" id="e_serial">
+ <label class="control-label">
+eq3-MAX ip address:(*)</label> 
+
+ <div class="controls"><input type="text" name="ipaddr" value="<#IPADDR#>" class="input">
+</div>
+
+</div>
+
+<div class="form-actions">
+ &nbsp;&nbsp;<a class="btn btn-default" href="?data_source=<#DATA_SOURCE#>&view_mode=scan&tab=info">SCAN</a>
+<button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+<input type="hidden" name="view_mode" value="update_settings">
+<input type="hidden" name="mode" value="update">
+</div>
+</fieldset>
+</form>
+</div>
+<br/>
+
 
 [#ONLINE#]
 
@@ -15,17 +56,6 @@ padding: .3em 1em
 
 
 
-<a href="https://www.eq-3.com/products/max.html"> 
-<img src="../img/modules/eq3-max.png" width="20%"  > 
-</a>
-&nbsp;&nbsp; &nbsp;&nbsp;
-&nbsp;&nbsp; &nbsp;&nbsp;
- &nbsp;&nbsp;<a class="btn btn-default" href="?data_source=<#DATA_SOURCE#>&view_mode=scan&tab=info">SCAN</a>
-
-
-
- &nbsp; 
-</div>
 
 
 
