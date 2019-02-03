@@ -1,6 +1,6 @@
 <?php
 /**
-* magichome module by dmitriy sannikov for majordomo
+* eq3-max  module by dmitriy sannikov for majordomo
 * sannikovdi@yandex.ru
 * @package project
 * @author Wizard <sergejey@gmail.com>
@@ -179,6 +179,72 @@ $this->delete_once($this->id);
 }  
 
 
+ function getinfo2($id) {
+
+//https://www.domoticaforum.eu/viewtopic.php?f=66&t=6654
+
+// This script shows the eq3 info in a simple output format.
+
+// example to call this page
+// http://127.0.0.1/eq3/eq3read.php
+
+//echo "<pre>";
+
+
+
+  $cubehost = "95.161.217.86";
+// The port number of the cube. This seems to be the default port
+  $cubeport = "62910";
+
+
+
+//$cmd_rec = SQLSelectOne($sql);
+//$host=$cmd_rec['IP'];
+$host='95.161.217.86';
+$port=62910;
+
+if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+    die("Couldn't create socket: [$errorcode] $errormsg \n");
+}
+
+//Connect socket to remote server
+if(!socket_connect($sock , $host , $port))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+
+}
+//81:8a:8b:96
+//$message="81:8a:8b";
+//$message=str_replace(":","",$message);
+//$message=$message.$this->csum($message);
+//sg('test.message', $message);
+//$hexmessage=hex2bin($message);
+
+//    socket_sendto($sock, $hexmessage, strlen($hexmessage), 0, $host, $port);
+
+//            $receiveStr = "";
+            $receiveStr = socket_read($sock, 1024, PHP_BINARY_READ);  // The 2 band data received 
+                      $receiveStrHex = bin2hex ($receiveStr);   // the 2 hexadecimal data convert 16 hex
+
+
+
+socket_close($sock);
+
+$buf= $receiveStrHex;
+
+echo $buf;
+
+debmes($buf, 'eq3max');
+
+}
+
+
 
 
  function propertySetHandle($object, $property, $value) {
@@ -217,7 +283,7 @@ $sql="SELECT * FROM eq3max_devices WHERE ID=".(int)$properties[$i]['DEVICE_ID'];
 
    
 function edit_devices(&$out, $id) {
-require(DIR_MODULES.$this->name . '/magichome_devices_edit.inc.php');
+require(DIR_MODULES.$this->name . '/eq3max_devices_edit.inc.php');
 }
 
 
@@ -225,7 +291,7 @@ require(DIR_MODULES.$this->name . '/magichome_devices_edit.inc.php');
 
  function search_devices(&$out) {
 
-$mhdevices=SQLSelect("SELECT * FROM magichome_devices");
+$mhdevices=SQLSelect("SELECT * FROM eq3max_devices");
 $total = count($mhdevices);
 for ($i = 0; $i < $total; $i++)
 { 
@@ -235,17 +301,17 @@ $lastping=$mhdevices[$i]['LASTPING'];
 if (time()-$lastping>300) {
 $online=ping(processTitle($ip));
     if ($online) 
-{SQLexec("update magichome_devices set ONLINE='1', LASTPING=".time()." where IP='$ip'");} 
+{SQLexec("update e3max_devices set ONLINE='1', LASTPING=".time()." where IP='$ip'");} 
 else 
-{SQLexec("update magichome_devices set ONLINE='0', LASTPING=".time()." where IP='$ip'");}
+{SQLexec("update eq3max_devices set ONLINE='0', LASTPING=".time()." where IP='$ip'");}
 }}
 
 
-  $mhdevices=SQLSelect("SELECT *, substr(CURRENTCOLOR,13,6) CCOLOR, substr(CURRENTCOLOR,10,2) BR, substr(CURRENTCOLOR,5,2) TURN FROM magichome_devices");
+  $mhdevices=SQLSelect("SELECT *, substr(CURRENTCOLOR,13,6) CCOLOR, substr(CURRENTCOLOR,10,2) BR, substr(CURRENTCOLOR,5,2) TURN FROM eq3max_devices");
      $total = count($mhdevices);
          for ($i = 0; $i < $total; $i++) {
 
-  $mhdevices[$i]['COMMANDS']=SQLSelect('select * from magichome_effects');
+
 }
 
 
@@ -294,9 +360,13 @@ function usual(&$out) {
  function scan() {
 
 $ip = "255.255.255.255";
-$port = 48899;
+$port = 23272;
 
-$str  = 'HF-A11ASSISTHREAD';
+//$str  = 'HF-A11ASSISTHREAD';
+
+
+//$str= 0x65 0x51 0x33 0x4d 0x61 0x78 0x2a 0x00 0x2a 0x2a 0x2a 0x2a 0x2a 0x2a 0x2a 0x2a 0x2a 0x2a 0x49;
+$str= 0x6551334d61782a002a2a2a2a2a2a2a2a2a2a49;
 
 
 		$cs = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
@@ -319,6 +389,9 @@ socket_sendto($cs, $str, strlen($str), 0, $ip, $port);
 
 
 			if($buf != NULL){
+
+echo $buf;
+
 if ($ip) {
 
 $par=explode(",",$buf);
@@ -368,7 +441,7 @@ $total = count($commands);
                $cmd_rec['DEVICE_ID']=$idd;
                $cmd_rec['TITLE']=$commands[$i];
 //               $cmd_rec['MODEL']=$commands[$i];
-               SQLInsert('magichome_commands',$cmd_rec);
+               SQLInsert('eq3max_commands',$cmd_rec);
            
 }}}}}}
 
@@ -414,7 +487,7 @@ function delete_once($id) {
 
 
 function set_favorit($id, $color) {
-  SQLExec("update magichome_devices set FAVORITCOLOR='$color' WHERE id=".$id);
+  SQLExec("update eq3max_devices set FAVORITCOLOR='$color' WHERE id=".$id);
   $this->redirect("?");
  }
 
