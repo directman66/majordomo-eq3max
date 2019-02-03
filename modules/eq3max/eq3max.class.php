@@ -138,9 +138,23 @@ function admin(&$out) {
  $this->getConfig();
 // $this->search_devices($out);
 
+  $this->getConfig();
+  $out['IPADDR']=$this->config['IPADDR'];
+
   if ($this->view_mode=='' || $this->view_mode=='info') {
 $this->search_devices($out);
   }
+
+
+  if ($this->view_mode=='update_settings') {
+    global $ipaddr;
+    $this->config['IPADDR']=$ipaddr;
+    
+
+    $this->saveConfig();
+    $this->redirect("?");
+  }
+
 
 
 
@@ -149,6 +163,15 @@ if ($this->view_mode=='scan') {
 $this->scan();
 //   $this->search_devices($out);
 }  
+
+
+if ($this->view_mode=='get') {
+
+$this->get();
+//   $this->search_devices($out);
+}  
+
+
 
 if ($this->view_mode=='delete_devices') {
 $this->delete_once($this->id);
@@ -179,70 +202,519 @@ $this->delete_once($this->id);
 }  
 
 
- function getinfo2($id) {
 
+ function get() {
+
+debmes("1111111111111111111111111111111111111111111111111111111111111111",'eq3max');
+  $this->getConfig();
+  $host=$this->config['IPADDR'];
+  $port = "62910";
 //https://www.domoticaforum.eu/viewtopic.php?f=66&t=6654
 
-// This script shows the eq3 info in a simple output format.
+$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+socket_set_option($socket,SOL_SOCKET, SO_RCVTIMEO, array("sec"=>5, "usec"=>0));
 
-// example to call this page
-// http://127.0.0.1/eq3/eq3read.php
+$bufff="";
+        if (socket_connect($socket, $host, $port)) {  //Connect
 
+
+	while(@socket_recvfrom($socket, $buf, 1024, 0, $host, $port)){
+
+//sg('test.buf',$buf);
+
+
+
+			if($buf != NULL){
+
+
+//$buff[]=$buf;
+$bufff.=$buf;
+
+} 
+else {
+@socket_shutdown($cs, 2);
+socket_close($cs);
+debmes('Закрыли сокет, обмен закончен', 'eq3max');
+}
+}
+        $buff=explode(chr(10),$bufff);
+	$total=count( $buff);
+         for ($i=0;$i<$total;$i++) {
+        $this->parsing($buff[$i]);
+echo $i.":".$buff[$i]."<hr>";
+				    }
+
+
+
+}
+}
+
+
+
+
+
+function parsing ($buf){
+
+echo     $buf ."<br><br>";
+debmes($buf[0]."-------------",'eq3max');
+debmes($buf,'eq3max');
+
+if ($buf[0]=='H') {
+
+debmes('H-ответ содержит информацию о кубе' ,'eq3max');
+/*
+H-ответ («Incoming Hello») 
+
+H-ответ содержит информацию о кубе. 
+Пример: 
+H: IEQ0123456,00b3b4,0102,00000000,355df98a, 03,32
+
+Полезная нагрузка может быть разделена запятой на несколько частей:
+КОД: ВЫБРАТЬ ВСЕ
+IEQ0123456  Serial number 
+00b3b4      RF address, hexadecimal
+0102        Firmware version, 1.0.2
+00000000    ?
+355df98a    ?
+03          ?
+32          ?
+*/
+
+
+
+$ar=explode(',',$buf);
+$sn=$ar[0];
+$rfaddr=$ar[1];
+$firmware=$ar[2];
+
+
+    $v=$buf;
+    $arr2 = explode(',',substr($v,2,strlen($v)));
+    $str = base64_decode($arr2[2]);
+    $this->retarr["cube"]["hSerialNumber"] = $arr2[0];
+    $this->retarr["cube"]["hRFAdress"] = $arr2[1];
+    $this->retarr["cube"]["hFirmware"] = $arr2[2];
+    $this->retarr["cube"]["h1?"] = $arr2[3]; //00000000
+    $this->retarr["cube"]["hHTTP-ConnID"] = $arr2[4];
+    $this->retarr["cube"]["hDuty cycle"] = hexdec($arr2[5]);
+    $this->retarr["cube"]["hFree memory slots"] = hexdec($arr2[6]); //31
+    $this->retarr["cube"]["hCube Date"] = hexdec(substr($arr2[7],4,2))."-".hexdec(substr($arr2[7],2,2))."-".hexdec(substr($arr2[7],0,2));
+    $this->retarr["cube"]["hCube Time"] = hexdec(substr($arr2[8],0,2)).":".hexdec(substr($arr2[8],2,2));
+    //$this->retarr["cube"]["hTimestamp"] = mktime(hexdec(substr($arr2[8],0,2)),hexdec(substr($arr2[8],2,2)),0,hexdec(substr($arr2[7],2,2)),hexdec(substr($arr2[7],4,2)),hexdec(substr($arr2[7],0,2)));
+    $this->retarr["cube"]["hStateCubeTime"] = $arr2[9];
+    $this->retarr["cube"]["hNtpCount"] = $arr2[10];
+
+
+
+debmes('H:serial number:'.$sn.' rfaddr='.$rfaddr." firmware=".$firmware, 'eq3max');
+debmes('H:hSerialNumber:'.$this->retarr["cube"]["hSerialNumber"], 'eq3max');
+debmes('H:hFree memory slot:'.$this->retarr["cube"]["hFree memory slots"], 'eq3max');
+debmes('H:hCube Date:'.$this->retarr["cube"]["hCube Date"], 'eq3max');
+debmes('H:hStateCubeTime:'.$this->retarr["cube"]["hCube Time"], 'eq3max');
+debmes('H:hNtpCount:'.$this->retarr["cube"]["hNtpCount"], 'eq3max');
+
+
+
+}
+
+
+if ($buf[0]=='M') {
+/*
+debmes('Ответ M содержит информацию о дополнительных данных, таких как определенные комнаты, устройства и имена, которые им были даны, и как комнаты и устройства связаны друг с другом. ' ,'eq3max');
+/*
+Ответ M («Метаданные»)
+
+Ответ M содержит информацию о дополнительных данных, таких как определенные комнаты, устройства и имена, которые им были даны, и как комнаты и устройства связаны друг с другом. 
+Пример:
+M: 00,01, VgIBAQpIb2JieWthbWVyADUIAQEANQhJRVEwMTA5MTI1DFRoZXJtb3N0YXQgMQEB
+Декодировано:
+КОД: ВЫБРАТЬ ВСЕ
+00: 56 02 01 01 0A 48 6F 62 62 79 6B 61 6D 65 72 00 | V....Hobbykamer.
+10: 35 08 01 01 00 35 08 49 45 51 30 31 30 39 31 32 | 5....5.IEQ010912
+20: 35 0C 54 68 65 72 6D 6F 73 74 61 74 20 31 01 01 | 5.Thermostat 1..
+
+Пока не все данные известны, но можно распознать следующие 2 «структуры». Номер имеет следующую структуру:
+
+КОД: ВЫБРАТЬ ВСЕ
+Description        Startpos    Length      Example Value
+
+Room id            00          1           1
+Room name length   01          1           0A
+Room name          02          variable    Hobbykamer
+Address(?)                     3           003508
+
+
+Устройство имеет следующую структуру:
+КОД: ВЫБРАТЬ ВСЕ
+Description        Startpos    Length      Example Value
+
+Device type        00          1           1
+Address            01          3           003508
+Serial Number      04          10          IEQ0109125
+Name length        0E          1           0C
+Name               0F          variable    Thermostat 1
+Room id                        1           01
+
+
+Некоторые из байтов до сих пор неизвестны. 
+*/
+
+/*
+$ar=explode(',',$buf);
+//$sn=$ar[1];
+//$rfaddr=$ar[2];
+$data=$ar[2];
 //echo "<pre>";
+//echo $data;
+//echo "</pre>";
+$dataenc=base64_decode($data);
 
 
+//debmes('M:data:'.$data, 'eq3max');
+//debmes('M:data_deсode:'.$dataenc, 'eq3max');
+   $v=$buf;
+    $arr2 = explode(',',$v);
+    $str = base64_decode($arr2[2]);
 
-  $cubehost = "95.161.217.86";
-// The port number of the cube. This seems to be the default port
-  $cubeport = "62910";
+    $this->pos = 0;
+    $this->retarr["meta"]["m?1"] = $this->dechex2str($str, 1);
+    $this->retarr["meta"]["m?2"] = $this->dechex2str($str, 1);
+    $this->roomcount = $this->dechex2str($str, 1);
+    $this->retarr["meta"]["mRoomCount"] = $this->roomcount;
+    
+    for($j = 1 ; $j <= $this->roomcount ; $j++) {
+      $RoomID = $this->dechex2str($str, 1);
+      $this->retarr["room"][$RoomID]["mRoomID"]=$RoomID;
+      $this->retarr["room"][$RoomID]["mRoomNameLength"]=$this->ord2str($str, 1);
+      $this->retarr["room"][$RoomID]["mRoomName"]= $this->substr2str($str,$this->retarr["room"][$RoomID]["mRoomNameLength"]);
+      $this->retarr["room"][$RoomID]["mFirstRFAdress"] = $this->strpaddechex2str($str, 3,2);
+    }
 
+    $this->devccount = $this->dechex2str($str, 1);
+    $this->retarr["meta"]["mDevCount"] = $this->devccount;
+    
+    //if (($msgtype=="all") or ($msgtype=="M:") ) {
+      for($j = 1 ; $j <= $this->devccount; $j++) {
+        //The devicetype indicates what type of device it is:
+        //0       Cube
+        //1       Heating Thermostat
+        //2       Heating Thermostat Plus
+        //3       Wall mounted Thermostat
+        //4       Shutter contact
+        //5       Push Button  
+        $this->retarr["devc"][$j]["mDeviceType"] = $this->dechex2str($str, 1);
+        debmes( "devc".$j."mDeviceType:".$this->retarr["devc"][$j]["mDeviceType"], 'eq3max');
 
+        $this->retarr["devc"][$j]["mRFAdress"] = $this->strpaddechex2str($str, 3,2);
+        debmes( "devc".$j."mRFAdress:".$this->retarr["devc"][$j]["mRFAdress"], 'eq3max');
 
-//$cmd_rec = SQLSelectOne($sql);
-//$host=$cmd_rec['IP'];
-$host='95.161.217.86';
-$port=62910;
+        $this->retarr["devc"][$j]["mSerialNumber"] = $this->substr2str($str,10);
+        debmes( "devc".$j."mSerialNumber:".$this->retarr["devc"][$j]["mSerialNumber"], 'eq3max');
 
-if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
-{
-    $errorcode = socket_last_error();
-    $errormsg = socket_strerror($errorcode);
+        $this->retarr["devc"][$j]["mNameLength"] = $this->ord2str($str, 1);
+        debmes( "devc".$j."mNameLength:".$this->retarr["devc"][$j]["mNameLength"], 'eq3max');
 
-    die("Couldn't create socket: [$errorcode] $errormsg \n");
+        $this->retarr["devc"][$j]["mDeviceName"] = $this->substr2str($str,$this->retarr["devc"][$j]["mNameLength"]);
+        debmes( "devc".$j."mDeviceName:".$this->retarr["devc"][$j]["mDeviceName"], 'eq3max');
+
+        $this->retarr["devc"][$j]["mRoomID"] = $this->dechex2str($str, 1);
+        debmes( "devc".$j."mRoomID:".$this->retarr["devc"][$j]["mRoomID"], 'eq3max');
+      }
+    //}
+	
+
+*/
+
 }
 
-//Connect socket to remote server
-if(!socket_connect($sock , $host , $port))
-{
-    $errorcode = socket_last_error();
-    $errormsg = socket_strerror($errorcode);
+
+if ($buf[0]=='C') {
+debmes('Ответ C содержит информацию о конфигурации устройства. ' ,'eq3max');
+/*
+
+Ответ C содержит информацию о конфигурации устройства. 
+Пример: 
+C: 003508,0gA1CAEBFP9JRVEwMTA5MTI1KCg9CQcoAzAM / wBESFUIRSBFIEUgRSBFIEUgRSBFIEUgRSBFIERIVQhFIEUgRSBFIEUgRSBFIEUgRSBFIEUg 
+REhUbETMVRRFIEUgRSBFIEUgRSBFIEUgRSBESFRsRMxVFEUgRSBFIEUgRSBFIEUgRSBFIERIUmxEzFUURSBFIEUgRSBFIEUgRSBFIEUgREhUbETMVRRFIE 
+UgRSBFIEUgRSBFIEUgRSBESFRsRMxVFEUgRSBFIEUgRSBFIEUgRSBFIA ==
+
+Полезная нагрузка может быть разделена на символ запятой в 2 -х частей:
+КОД: ВЫБРАТЬ ВСЕ
+003508        RF address of the device
+0gA1...IA==   Base 64 encoded configuration data
+
+Вторая часть расшифрована в шестнадцатеричном виде:
+КОД: ВЫБРАТЬ ВСЕ
+00: D2 00 35 08 01 01 14 FF 49 45 51 30 31 30 39 31  |Ò.5....ÿIEQ01091
+10: 32 35 28 28 3D 09 07 28 03 30 0C FF 00 44 48 55  |25((=..(.0.ÿ.DHU
+20: 08 45 20 45 20 45 20 45 20 45 20 45 20 45 20 45  |.E E E E E E E E
+30: 20 45 20 45 20 45 20 44 48 55 08 45 20 45 20 45  | E E E DHU.E E E
+40: 20 45 20 45 20 45 20 45 20 45 20 45 20 45 20 45  | E E E E E E E E
+50: 20 44 48 54 6C 44 CC 55 14 45 20 45 20 45 20 45  | DHTlDÌU.E E E E
+60: 20 45 20 45 20 45 20 45 20 45 20 44 48 54 6C 44  | E E E E E DHTlD
+70: CC 55 14 45 20 45 20 45 20 45 20 45 20 45 20 45  |ÌU.E E E E E E E
+80: 20 45 20 45 20 44 48 52 6C 44 CC 55 14 45 20 45  | E E DHRlDÌU.E E
+90: 20 45 20 45 20 45 20 45 20 45 20 45 20 45 20 44  | E E E E E E E D
+A0: 48 54 6C 44 CC 55 14 45 20 45 20 45 20 45 20 45  |HTlDÌU.E E E E E
+B0: 20 45 20 45 20 45 20 45 20 44 48 54 6C 44 CC 55  | E E E E DHTlDÌU
+C0: 14 45 20 45 20 45 20 45 20 45 20 45 20 45 20 45  |.E E E E E E E E
+D0: 20 45 20                                         | E              
+
+Смысл всего этого:
+КОД: ВЫБРАТЬ ВСЕ
+Start Length  Value       Description
+==================================================================
+00         1  D2          Length of data: D2 = 210(decimal) = 210 bytes
+01         3  003508      RF address
+04         1  01          Device Type
+05         3  0114FF      ?
+08        10  IEQ0109125  Serial Number       
+12         1  28          Comfort Temperature      
+13         1  28          Eco Temperature          
+14         1  3D          MaxSetPointTemperature  
+15         1  09          MinSetPointTemperature  
+16         1  07          Temperature Offset * 2
+                          The default value is 3,5, which means the offset = 0 degrees. 
+                          The offset is adjustable between -3,5 and +3,5 degrees, 
+                          which results in a value in this response between 0 and 7 (decoded already)       
+17         1  28          Window Open Temperature   
+18         1  03          Window  Open Duration      
+19         1  30          Boost Duration and Boost Valve Value
+                          The 3 MSB bits gives the duration, the 5 LSB bits the Valve Value%.
+                          Duration: With 3 bits, the possible values (Dec) are 0 to 7, 0 is not used. 
+                          The duration in Minutes is: if Dec value = 7, then 30 minutes, else Dec value * 5 minutes
+                          Valve Value: dec value 5 LSB bits * 5 gives Valve Value in %
+1A         1  0C          Decalcification: Day of week and Time
+                          In bits: DDDHHHHH 
+                          The three most significant bits (MSB) are presenting the day, Saturday = 1, Friday = 7
+                          The five least significant bits (LSB) are presenting the time (in hours)     
+1B         1  FF          Maximum Valve setting; *(100/255) to get in %
+1C         1  00          Valve Offset ; *(100/255) to get in %
+1D         ?  44 48 ...   Weekly program (see The weekly program)
+
+*/
+
+
+
+$ar=explode(',',$buf);
+$rfadr=$ar[0];
+//$rfaddr=$ar[2];
+$data=$ar[1];
+//echo "<pre>";
+//echo $data;
+//echo "</pre>";
+  $dataenc=base64_decode ($data);
+
+    $str = base64_decode($data);
+
+
+    unset($hilf);
+    $this->pos = 0;
+    $hilf["?1"] = $this->ord2str($str,1);
+
+    $hilf["RFAdress"] = $this->strpaddechex2str($str, 3, 2);
+    $hilf["DeviceType"] = $this->dechex2str($str,1);
+    
+    $hilf["?2"] = $this->dechex2str($str,3);
+    $this->pos = $this->pos -3;
+    
+    ////$deviceconf[$hilf["RFAdress"]]["?FirmwareXX"]="";
+    ////$readlen =  2; for($i = $this->pos; $i < $readlen+$this->pos ; $i++) $deviceconf[$hilf["RFAdress"]]["?FirmwareXX"] .= dechex(ord(substr($str,$i,1)))." ";  $this->pos += $readlen;
+    ////$this->pos = $this->pos -2;
+    
+    $hilf["?RoomId"] = $this->ord2str($str,1);
+    $hilf["?FirmwareVersion"] = $this->ord2str($str,1);
+    $hilf["?NumModus"] = $this->ord2str($str,1);
+    
+    $hilf["SerialNumber"]= $this->substr2str($str,10);
+
+
+debmes('C:RFAdress:'.$hilf["RFAdress"], 'eq3max');
+debmes('C:RoomId:'.$hilf["?RoomId"], 'eq3max');
+debmes('C:FirmwareVersion:'.$hilf["?FirmwareVersion"], 'eq3max');
+debmes('C:SerialNumber:'.$hilf["SerialNumber"], 'eq3max');
+debmes('C:rfadr:'.$rfadr, 'eq3max');
+debmes('C:data:'.$data, 'eq3max');
+debmes('C:DeviceType:'.$hilf["DeviceType"], 'eq3max');
+
+
+	$rec=SQLSelectOne("SELECT * FROM eq3max_devices where RFADDRESS='".$hilf["RFAdress"]."'");
+	$rec['RFADDRESS']=$hilf["RFAdress"];
+	$rec['FIRMWARE']=$hilf["?FirmwareVersion"];
+	$rec['ROOMID']=$hilf["?RoomId"];
+	$rec['SERIALNUMBER']=$hilf["SerialNumber"];
+	$rec['DEVICETYPE']=$hilf["DeviceType"];
+
+	if ($rec['ID']) {
+	SQLUpdate('eq3max_devices', $rec);
+	} else 
+	{
+	SQLInsert('eq3max_devices', $rec);
+	}
+
+//debmes('C:data_ecnode:'.$dataenc, 'eq3max');
+
+/*
+    switch($hilf["DeviceType"]){
+      case "0":
+	debmes('C:DeviceType:Cube', 'eq3max');
+      // Cube
+      $this->retarr["cube"]["c?DataLength"] = $hilf["?1"];
+      $this->retarr["cube"]["cRFAdress"] = $hilf["RFAdress"];
+      $this->retarr["cube"]["cDeviceType"] = $hilf["DeviceType"];
+      $this->retarr["cube"]["c?2"] = $hilf["?2"];
+      $this->retarr["cube"]["c?RoomId"] = $hilf["?RoomId"];
+      $this->retarr["cube"]["c?FirmwareVersion"] = $hilf["?FirmwareVersion"];
+      $this->retarr["cube"]["c?NumModus"] = $hilf["?NumModus"];
+      $this->retarr["cube"]["cSerialNumber"] = $hilf["SerialNumber"];
+      $this->retarr["cube"]["cPortalEnabled"] = $this->dechex2str($str,1);
+      
+      $this->retarr["cube"]["c?3"]=$this->dechex2str($str,4);
+//      dembes("cubec?3:".$this->retarr["cube"]["c?3"], 'eq3max');
+
+      $this->retarr["cube"]["c?4"]=$this->dechex2str($str,8);
+//      dembes("cubec?4:".$this->retarr["cube"]["c?4"], 'eq3max');
+
+      $this->retarr["cube"]["c?5"]=$this->dechex2str($str,21);      
+//      dembes("cubec?5:".$this->retarr["cube"]["c?5"], 'eq3max');
+
+      $this->retarr["cube"]["c?6"]=$this->dechex2str($str,4);
+//      dembes("cubec?6:".$this->retarr["cube"]["c?6"], 'eq3max');
+
+      $this->retarr["cube"]["c?7"]=$this->dechex2str($str,8);
+//    dembes("cubec?7:".$this->retarr["cube"]["c?7"], 'eq3max');
+
+      $this->retarr["cube"]["c?8"]=$this->dechex2str($str,21);
+//      dembes("cubec?8:".$this->retarr["cube"]["c?8"], 'eq3max');
+
+      $this->retarr["cube"]["cPortalURL"]=$this->substr2str($str,36);      
+//      dembes("cPortalURL:".$this->retarr["cube"]["cPortalURL"], 'eq3max');
+//      dembes("cPortalURL:".$this->substr2str($str,36), 'eq3max');
+
+      $this->retarr["cube"]["c?9"]=$this->dechex2str($str,60);
+//      dembes("cubec?9:".$this->retarr["cube"]["c?9"], 'eq3max');
+
+      $this->retarr["cube"]["c?A"]=$this->dechex2str($str,33);
+//      dembes("cubec?A:".$this->retarr["cube"]["c?A"], 'eq3max');
+
+      $this->retarr["cube"]["c?B"]=$this->substr2str($str,3);
+//      dembes("cubec?B:".$this->retarr["cube"]["c?B"], 'eq3max');
+
+      $this->retarr["cube"]["c?C"]=$this->dechex2str($str,9);
+//      dembes("cubec?C:".$this->retarr["cube"]["c?C"], 'eq3max');
+
+      $this->retarr["cube"]["c?D"]=$this->substr2str($str,4);
+//      dembes("cubec?D:".$this->retarr["cube"]["c?D"], 'eq3max');
+
+      $this->retarr["cube"]["c?E"]=$this->dechex2str($str,9);
+//      dembes("cubec?E:".$this->retarr["cube"]["c?E"], 'eq3max');
+    break;
+     
+    case "1":
+   	  break;
+   	 
+    case "2":
+      // Thermostat
+      debmes('C:DeviceType:Thermostat', 'eq3max');
+      $key = array_search($hilf["RFAdress"], array_column($this->retarr["devc"], 'mRFAdress'));
+      if ($key===false) {
+      	$key = count($this->retarr["devc"]) +1;
+      } else {
+        $key = $key + 1;
+      }
+        
+      $this->retarr["devc"][$key]["c?DataLength"] = $hilf["?1"];
+
+      $this->retarr["devc"][$key]["cRFAdress"] = $hilf["RFAdress"];
+      dembes("devc".$key."cRFAdress:".      $this->retarr["devc"][$key]["cRFAdress"], 'eq3max');
+
+      $this->retarr["devc"][$key]["cDeviceType"] = $hilf["DeviceType"];
+      dembes("devc".$key."DeviceType:".      $this->retarr["devc"][$key]["DeviceType"], 'eq3max');
+
+      $this->retarr["devc"][$key]["c?2"] = $hilf["?2"];
+      $this->retarr["devc"][$key]["c?RoomId"] = $hilf["?RoomId"];
+      $this->retarr["devc"][$key]["c?FirmwareVersion"] = $hilf["?FirmwareVersion"];
+      $this->retarr["devc"][$key]["c?NumModus"] = $hilf["?NumModus"];
+      $this->retarr["devc"][$key]["cSerialNumber"] = $hilf["SerialNumber"];
+      dembes("devc".$key."SerialNumber:".      $this->retarr["devc"][$key]["SerialNumber"], 'eq3max');
+
+      $this->retarr["devc"][$key]["cComfortTemperature"] = ($this->ord2str($str, 1) /2) ;
+      dembes("devc".$key."cComfortTemperature:".      $this->retarr["devc"][$key]["cComfortTemperature"], 'eq3max');
+
+      $this->retarr["devc"][$key]["cEcoTemperature"] = ($this->ord2str($str, 1) /2) ;
+      dembes("devc".$key."cEcoTemperature:".      $this->retarr["devc"][$key]["cEcoTemperature"], 'eq3max');
+
+      $this->retarr["devc"][$key]["cMaxSetPointTemperature"] = ($this->ord2str($str, 1) /2) ;
+      dembes("devc".$key."cEcoTemperature:".      $this->retarr["devc"][$key]["cEcoTemperature"], 'eq3max');
+
+      $this->retarr["devc"][$key]["cMinSetPointTemperature"] = ($this->ord2str($str, 1) /2) ;
+      dembes("devc".$key."cMinSetPointTemperature:".      $this->retarr["devc"][$key]["cMinSetPointTemperature"], 'eq3max');
+
+
+      $this->retarr["devc"][$key]["cTemperatureOffse"] = ($this->ord2str($str, 1) /2) -3.5 ;
+      dembes("devc".$key."cTemperatureOffse:".      $this->retarr["devc"][$key]["cTemperatureOffse"], 'eq3max');
+
+      $this->retarr["devc"][$key]["cWindowOpenTemperature"] = ($this->ord2str($str, 1) /2) ;
+      dembes("devc".$key."cWindowOpenTemperature:".      $this->retarr["devc"][$key]["cWindowOpenTemperature"], 'eq3max');
+
+      $this->retarr["devc"][$key]["cWindowOpenDuration"] = $this->dechex2str($str, 1);
+      $this->retarr["devc"][$key]["cBoost"] = $this->strpaddecbin2str($str,1,8);
+      $this->retarr["devc"][$key]["cBoostDuration"] = bindec(substr($this->retarr["devc"][$key]["cBoost"],0,3))*5;
+      $this->retarr["devc"][$key]["cBoostValue"] = bindec(substr($this->retarr["devc"][$key]["cBoost"],3,5))*5;
+      $this->retarr["devc"][$key]["cDecalc"] = $this->strpaddecbin2str($str,1,8);
+      $readlen =  1; $this->retarr["devc"][$key]["cDecalcDay"] = bindec(substr($this->retarr["devc"][$key]["cDecalc"],0,3));
+      $readlen =  1; $this->retarr["devc"][$key]["cDecalcTime"] = bindec(substr($this->retarr["devc"][$key]["cDecalc"],3,5));
+      $this->retarr["devc"][$key]["cMaximumValveSetting"] = $this->dechex2str($str, 1) *(100/255);
+      $this->retarr["devc"][$key]["cValveOffset"] = $this->dechex2str($str, 1) *(100/255);
+      
+      for ($j = 1 ; $j <= 7 ; $j++) {
+        $readlen = 26;// Sat, Sun, Mon, Tue, Weg, Thu, Fri
+        $idx=0;
+        for($i = $this->pos; $i < $readlen+$this->pos ; $i+=2){
+          $idx=$idx+1;
+          $bin  = str_pad(decbin(hexdec(dechex(ord(substr($str,$i,1))))),8,"0",STR_PAD_LEFT).str_pad(decbin(hexdec(dechex(ord(substr($str,$i+1,1))))),8,"0",STR_PAD_LEFT);
+          $deg = bindec(substr($bin,0,7));
+          $min = bindec(substr($bin,7,9));
+          if ( ($idx>1) and ($this->retarr["devc"][$key]["cWeeklyProgramm"][$j][$idx-1]["deg"]==($deg/2)) ) { 
+            $idx=$idx-1;
+          }
+          $this->retarr["devc"][$key]["cWeeklyProgramm"][$j][$idx]["deg"]= ($deg/2);
+          $devctime= gmdate("H:i", ($min * 5 * 60));
+          if ( ($devctime == '00:00') and ($min>0) ) {
+            $devctime = '24:00';
+          }
+          $this->retarr["devc"][$key]["cWeeklyProgramm"][$j][$idx]["time"]= $devctime ;
+        }
+        $this->pos += $readlen;
+      }
+      break;
+     
+    case "4":
+      // Fensterkontakt
+      break;
+
+    default:
+      // Other
+      break;
+    }	
+*/
+
+
+
+
+
+
 
 
 }
-//81:8a:8b:96
-//$message="81:8a:8b";
-//$message=str_replace(":","",$message);
-//$message=$message.$this->csum($message);
-//sg('test.message', $message);
-//$hexmessage=hex2bin($message);
-
-//    socket_sendto($sock, $hexmessage, strlen($hexmessage), 0, $host, $port);
-
-//            $receiveStr = "";
-            $receiveStr = socket_read($sock, 1024, PHP_BINARY_READ);  // The 2 band data received 
-                      $receiveStrHex = bin2hex ($receiveStr);   // the 2 hexadecimal data convert 16 hex
 
 
-
-socket_close($sock);
-
-$buf= $receiveStrHex;
-
-echo $buf;
-
-debmes($buf, 'eq3max');
+if ($buf[0]=='U') {
+}
 
 }
+
+
 
 
 
@@ -292,22 +764,8 @@ require(DIR_MODULES.$this->name . '/eq3max_devices_edit.inc.php');
  function search_devices(&$out) {
 
 $mhdevices=SQLSelect("SELECT * FROM eq3max_devices");
-$total = count($mhdevices);
-for ($i = 0; $i < $total; $i++)
-{ 
-$ip=$mhdevices[$i]['IP'];
-$lastping=$mhdevices[$i]['LASTPING'];
-//echo time()-$lastping;
-if (time()-$lastping>300) {
-$online=ping(processTitle($ip));
-    if ($online) 
-{SQLexec("update e3max_devices set ONLINE='1', LASTPING=".time()." where IP='$ip'");} 
-else 
-{SQLexec("update eq3max_devices set ONLINE='0', LASTPING=".time()." where IP='$ip'");}
-}}
 
-
-  $mhdevices=SQLSelect("SELECT *, substr(CURRENTCOLOR,13,6) CCOLOR, substr(CURRENTCOLOR,10,2) BR, substr(CURRENTCOLOR,5,2) TURN FROM eq3max_devices");
+  $mhdevices=SQLSelect("SELECT * FROM eq3max_devices");
      $total = count($mhdevices);
          for ($i = 0; $i < $total; $i++) {
 
@@ -545,18 +1003,14 @@ function set_favorit($id, $color) {
  $data = <<<EOD
  eq3max_devices: ID int(10) unsigned NOT NULL auto_increment
  eq3max_devices: TITLE varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: IP varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: PORT varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: MAC varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: ONLINE varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: LASTPING varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: FAVORITCOLOR varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: CURRENTCOLOR varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: FIND varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: MODEL varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: ZONE varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: LINKED_OBJECT varchar(100) NOT NULL DEFAULT ''
- eq3max_devices: LINKED_PROPERTY varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: RFADDRESS varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: DEVICETYPE varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: SERIALNUMBER varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: DEVICENAME varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: ROOMID varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: FIRMWARE varchar(100) NOT NULL DEFAULT ''
+
+
 EOD;
   parent::dbInstall($data);
 
@@ -600,6 +1054,59 @@ SQLInsert('eq3max_commands', $par);
 
 
 
+
+
+  function strpaddechex2str($str, $readlen, $padlen){
+    $outstr="";
+    for ($idx = 1 ; $idx <= $readlen ; $idx++) {
+	  $outstr = $outstr . str_pad(dechex(ord(substr($str,$this->pos,1))),$padlen,"0",STR_PAD_LEFT);
+	  $this->pos = $this->pos + 1;
+    }
+    return $outstr;
+  }
+  
+
+  function strpaddecbin2str($str, $readlen, $padlen){
+    $outstr="";
+    for ($idx = 1 ; $idx <= $readlen ; $idx++) {
+	  $outstr = $outstr .  str_pad(decbin(ord(substr($str,$this->pos,1))),8,"0",STR_PAD_LEFT);
+	  $this->pos = $this->pos + 1;
+    }
+    return $outstr;
+  }
+
+  function dechex2str($str, $readlen){
+    $outstr="";
+    for ($idx = 1 ; $idx <= $readlen ; $idx++) {
+	  $outstr = $outstr . dechex(ord(substr($str,$this->pos,1)));
+	  $this->pos = $this->pos + 1;
+    }
+    return $outstr;
+  }
+
+  function ord2str($str, $readlen) {
+    $outstr="";
+    for ($idx = 1 ; $idx <= $readlen ; $idx++) {
+	  $outstr = $outstr . ord(substr($str,$this->pos,1));
+	  $this->pos = $this->pos + 1;
+    }
+    return $outstr;
+  }
+  
+  function substr2str($str, $readlen) {
+  	$outstr="";
+      $outstr= substr($str,$this->pos,$readlen);
+      $this->pos = $this->pos + $readlen;
+    return $outstr;	
+  }
+  
+  function hex_to_base64($hex){
+    $return = '';
+    foreach(str_split($hex, 2) as $pair){
+      $return .= chr(hexdec($pair));
+    }
+    return base64_encode($return);
+  } 
  
 
 
