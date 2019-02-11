@@ -179,6 +179,9 @@ global $setpointtemp;
 
 debmes("view_mode:".$this->view_mode . "    rfaddr:".$rfaddr."    roomid:".$roomid. "   selectmode:".$selectmode."  setpointtemp:".$setpointtemp  , 'eq3max');
 
+
+SQLExec("update eq3max_devices set SETPOINTTEMP='".$setpointtemp."', setmode='".$selectmode."' where RFADDRESS='".$rfaddr."'");
+
 $this->SetTemp($rfaddr,$roomid, $selectmode,$setpointtemp);
 
 
@@ -1531,6 +1534,8 @@ function set_favorit($id, $color) {
  eq3max_devices: DATEUNTIL varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: TIMEUNTIL varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: MODE varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: SETPOINTTEMP varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: SETMODE varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: STATUS varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: UPDATED datetime
                
