@@ -53,16 +53,18 @@
 
 
 <td>
+
+[#if DEVICETYPETEXT='Thermostat'#]
 <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
 
-<input type="text" name="setpointtemp" value="<#SETPOINTTEMP#>" class="input" size=2>
+<input type="text" name="setpointtemp" value="[#SETPOINTTEMP#]" class="input" size=2>
 
 
 
 <select name="selectmode"  >
 
-<option[#if MODE="manu"#] selected[#endif#]>manu
-<option[#if MODE="auto"#] selected[#endif#]>auto
+<option[#if SETMODE="manu"#] selected[#endif#]>manu
+<option[#if SETMODE="auto"#] selected[#endif#]>auto
 
 </select>
 
@@ -77,6 +79,8 @@
 <input type="hidden" name="mode" value="update">
 
 </form>
+
+[#endif#]
 </td>
 
 
