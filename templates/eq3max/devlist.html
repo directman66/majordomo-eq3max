@@ -16,9 +16,14 @@
   <td><b>ROOM</b></td>
 
  <td><b>SN</b></td>
+ <td><b>SETPONT</b></td>
+
+<td><b>TEMPERATURE</b></td>
+<td><b>MODE</b></td>
+<td><b>UPDATED</b></td>
 
 
-<td>ROOMID</td>
+<!--
 <td>ECOTEMP</td> 
 <td>MINSETPOINTTEMP</td> 
 <td>MAXSETPOINTTEMP</td> 
@@ -27,7 +32,7 @@
 <td>BOOST</td> 
 <td>DECALC</td> 
 
-
+-->
 
  </tr>
 
@@ -42,11 +47,46 @@
   <td>[#TITLE#]</td>
   <td>[#RFADDRESS#]</td>
   <td>[#DEVICETYPETEXT#]</td>
-  <td>[#ROOMID#]</td>
+  <td>[#ROOMNAME#]</td>
   <td>[#SERIALNUMBER#]</td>
 
-<td>[#ROOMID#]</td>
-<td>[#FIRMWARE#]</td>
+
+
+<td>
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+
+<input type="text" name="setpointtemp" value="<#SETPOINTTEMP#>" class="input" size=2>
+
+
+
+<select name="selectmode"  >
+
+<option[#if MODE="manu"#] selected[#endif#]>manu
+<option[#if MODE="auto"#] selected[#endif#]>auto
+
+</select>
+
+
+
+
+<button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_SET#></button>
+
+<input type="hidden" name="view_mode" value="setpointtemp_set">
+<input type="hidden" name="rfaddr" value="[#RFADDRESS#]">
+<input type="hidden" name="roomid" value="[#ROOMID#]">
+<input type="hidden" name="mode" value="update">
+
+</form>
+</td>
+
+
+
+<td>[#TEMPERATURE#]</td>
+<td>[#MODE#]</td>
+<td>[#UPDATED#]</td>
+
+<!--
+
 <td>[#ECOTEMP#]</td> 
 <td>[#MINSETPOINTTEMP#]</td> 
 <td>[#MAXSETPOINTTEMP#]</td> 
@@ -54,6 +94,7 @@
 <td>[#BOOST#]</td> 
 <td>[#DECALC#]</td> 
 <td>[#NUMMODUS#]</td> 
+-->
 
 
 <td>
