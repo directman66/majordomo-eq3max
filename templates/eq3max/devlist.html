@@ -17,6 +17,7 @@
 
  <td><b>SN</b></td>
  <td><b>SETPONT</b></td>
+ <td><b>BATTERY</b></td>
 
 <td><b>UPDATED</b></td>
 
@@ -46,6 +47,7 @@
   <td>[#RFADDRESS#]</td>
   <td>[#DEVICETYPETEXT#]</td>
   <td>[#ROOMNAME#]</td>
+
   <td>[#SERIALNUMBER#]</td>
 
 
@@ -83,7 +85,7 @@
 [#endif#]
 </td>
 
-
+  <td>[#BATTERY#]</td>
 <td>[#UPDATED#]</td>
 
 <!--
@@ -101,7 +103,7 @@
 <td>
 
 
-  <a href="?data_source=<#DATA_SOURCE#>&view_mode=edit_devices&id=[#ID#]&tab=info" class="btn btn-default" title="Редактировать"><i class="glyphicon glyphicon-pencil"></i></a>
+  <a href="?data_source=<#DATA_SOURCE#>&view_mode=edit_devices&id=[#ID#]&tab=edit_device" class="btn btn-default" title="Редактировать"><i class="glyphicon glyphicon-pencil"></i></a>
   <a href="?view_mode=delete_devices&id=[#ID#]&tab=info" onClick="return confirm('Are you sure? Please confirm.')" class="btn btn-default" title="<#LANG_DELETE#>"><i class="glyphicon glyphicon-trash"></i></a> 
   </td>
  </tr>
