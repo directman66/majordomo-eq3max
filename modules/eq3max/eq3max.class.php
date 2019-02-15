@@ -10,7 +10,7 @@
 //
 //
 //ini_set('max_execution_time', '600');
-//i_set ('display_errors', 'off');
+ini_set ('display_errors', 'off');
 class eq3max extends module {
 /**
 * milur
