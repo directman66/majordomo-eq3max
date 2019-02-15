@@ -494,8 +494,10 @@ $dataenc=base64_decode($data);
 	SQLUpdate('eq3max_devices', $rec);
 	} else 
 	{
+if ($rec['RFADDRESS'])	
+{
 	SQLInsert('eq3max_devices', $rec);
-	}
+	}}
 
 
       }
@@ -841,7 +843,11 @@ debmes('C:DeviceType:'.$hilf["DeviceType"], 'eq3max');
 	SQLUpdate('eq3max_devices', $rec);
 	} else 
 	{
+
+if ($rec['RFADDRESS'])	
+{
 	SQLInsert('eq3max_devices', $rec);
+}
 	}
 
 
@@ -862,9 +868,19 @@ L response («Список устройств»)
 Пример:
 L: CwA1CAASGiAshYsu
 Декодировано в шестнадцатеричном виде:
+
+0b 18f621091218000a000000 0c177190091218040a000000f90b18f604091218000a0000000b184af3091218000a0000000b18f614091218000a0000000b18f71ef11219000a000000
+
 КОДє ВЫБРАТЬ ВСЕ
 00: 0B 00 35 08 00 12 1A 20 2C 85 8B 2E              |..5.... ,…‹.    
 
+    0b 18 f6 21 09 12 18 00 0a 00 00 00               0b длинна 11 байт RF=18f621  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
+    0c 17 71 90 09 12 18 04 0a 00 00 00	f9	      0c длинна 12 байт RF=177190  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 4% 5gr
+    0b 18 f6 04 09 12 18 00 0a 00 00 00               f9 длинна 11 байт RF=18f604  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
+    0b 18 4a f3 09 12 18 00 0a 00 00 00	              0b длинна 11 байт RF=184af3  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
+    0b 18 f6 14 09 12 18 00 0a 00 00 00               0b длинна 11 байт RF=18f614  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
+    0b 18 f7 1e f1 12 19 00 0a 00 00 00               0b длинна 11 байт RF=18f71e  f1? 12= 00010010b(Valid, Initialized) 19 = 00011001b (01 manual,1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
+    
 
 КОДє ВЫБРАТЬ ВСЕ
 Start Length  Value       Description
@@ -876,7 +892,7 @@ Start Length  Value       Description
                           bit 3     Error              0=no; 1=Error occurred
                           bit 2     Answer             0=an answer to a command,1=not an answer to a command
                           bit 1     Status initialized 0=not initialized, 1=yes
-                               
+                                
                           12  = 00010010b
                               = Valid, Initialized
                           
@@ -891,6 +907,12 @@ Start Length  Value       Description
                                                  10=Vacation
                                                  11=Boost   
                           1A  = 00011010b
+
+                                00011010 - VACATION
+                                00011001   MANUAL
+				00011000 - AUTO	
+				00011011  - BOOST
+
                               = Battery OK, Linkstatus OK, Panel unlocked, Gateway known, DST active, Mode Vacation.
 
 7       1     20          Valve position in %
@@ -911,76 +933,233 @@ B       1     2E          Time until (23:00) (see Encoding/Decoding date/time)
 
 //    for($j = 1 ; $j <= $this->devccount; $j++) {
 
-    $devccount = $this->dechex2str($str, 1);
+//    $devccount = hexdec($this->dechex2str($str, 1));
 //    $devccount=6;
 
-//$devccount=SQLSelectOne('select count(*) value from eq3max_devices')['value'];
+      $devccount=SQLSelectOne('select count(*) value from eq3max_devices')['value'];
+//      debmes("33333333333333333333333333333333333", 'eq3max');
       debmes("devccount:".$devccount, 'eq3max');
 
     for($j = 0 ; $j <= $devccount+1; $j++) {
+      debmes("33333333333333333333333333333333333", 'eq3max');
+      debmes("device:".$j, 'eq3max');
+      debmes("bin:".$bin, 'eq3max');
+      debmes("33333333333333333333333333333333333", 'eq3max');
       unset($hilf);
-      $hilf["ReadLength"] = $this->ord2str($str, 1);
-      debmes("ReadLength:".$hilf["ReadLength"], 'eq3max');
-
-      $hilf["RFAdress"] = $this->strpaddechex2str($str, 3, 2);  
-      debmes("RFAdress:".$hilf["RFAdress"], 'eq3max');
+//      $hilf["ReadLength"] = $this->ord2str($str, 1);
+$lenght=hexdec(substr($bin,0,2))+1;
+        debmes("lenght:".substr($bin,0,2).":" .$lenght, 'eq3max');
 
 
-	$rec=SQLSelectOne("SELECT * FROM eq3max_devices where RFADDRESS='".$hilf["RFAdress"]."'");
-	$rec['RFADDRESS']=$hilf["RFAdress"];
+$tempstr=substr($bin,0,$lenght*2);
+debmes("обрезаем bin на первые ".$lenght*2 . " символов" , 'eq3max');
+debmes("было:  ".$bin  , 'eq3max');
+$bin=substr($bin,$lenght*2);
+debmes("стало: ".$bin  , 'eq3max');
+
+
+//      debmes("ReadLength:".substr($bin,1,2).":" .$hilf["ReadLength"], 'eq3max');
+
+      debmes("Readstring:".$tempstr, 'eq3max');
+$rfadress=substr($tempstr,2,6);
+//      $hilf["RFAdress"] = $this->strpaddechex2str($str, 3, 2);  
+      debmes("RFAdress:".$rfadress, 'eq3max');
+
+
+	$rec=SQLSelectOne("SELECT * FROM eq3max_devices where RFADDRESS='".$rfadress."'");
+//	$rec['RFADDRESS']=$hilf["RFAdress"];
+	$rec['RFADDRESS']=$rfadress;
 
       $hilf["?1"] = $this->dechex2str($str, 1);
       debmes("?1:".$hilf["?1"], 'eq3max');
 
-      $hilf["Data1"] = $this->strpaddecbin2str($str,1,8);
-      debmes("Data1:".$hilf["Data1"], 'eq3max');
+      $data1 = str_pad(base_convert(substr($tempstr,10,2), 16, 2),8,"0",STR_PAD_LEFT);
+      debmes("Data1:".substr($tempstr,10,2).":".$data1, 'eq3max');
 
-      $hilf["Data2"] = $this->strpaddecbin2str($str,1,8);
-      debmes("Data2:".$hilf["Data2"], 'eq3max');
+      debmes("INITIALIZED:".$data1[6], 'eq3max');
+
+switch ($data1[6]) {
+
+	   case "1":
+	   $rec['INITIALIZED']='yes';
+      debmes("INITIALIZED:yes", 'eq3max');
+	   break;
+
+	   case "0":
+       debmes("INITIALIZED:no", 'eq3max');
+	   $rec['INITIALIZED']='no';
+	   break;
+}
+
+      debmes("ANSWER:".$data1[5], 'eq3max');
+switch ($data1[5]) {
+
+	   case "1":
+         debmes("ANSWER:not an answer to a command", 'eq3max');
+	   $rec['ANSWER']='not an answer to a command';
+	   break;
+
+	   case "0":
+           debmes("ANSWER:an answer to a command", 'eq3max');
+	   $rec['ANSWER']='an answer to a command';
+	   break;
+}
+
+      debmes("ERROR:".$data1[4], 'eq3max');
+switch ($data1[4]) {
+
+	   case "1":
+	   $rec['ERROR']='Error occurred';
+	   break;
+
+	   case "0":
+	   $rec['ERROR']='no';
+	   break;
+}
+
+      debmes("VALID:".$data1[3], 'eq3max');
+switch ($data1[3]) {
+
+	   case "1":
+	   $rec['VALID']='information provided is valid';
+	   break;
+
+	   case "0":
+	   $rec['VALID']='invalid';
+	   break;
+}
 
 
-      if($hilf["ReadLength"] == 11) {
-        $hilf["ValvePosition"]= $this->ord2str($str, 1);
-        debmes("ValvePosition:".$hilf["ValvePosition"], 'eq3max');
-	$rec['VALVEPOSITION']=$hilf["ValvePosition"];
+///////////////////////////////
 
-        $hilf["Temperature"] = $this->ord2str($str, 1)/2;
-        debmes("Temperature:".$hilf["Temperature"], 'eq3max');
-	$rec['TEMPERATURE']=$hilf["Temperature"];
+      $data2 = str_pad(base_convert(substr($tempstr,12,2), 16, 2),8,"0",STR_PAD_LEFT);
+      debmes("Data2:".substr($tempstr,12,2).":".$data2, 'eq3max');
 
-        $hilf["DateUntil"] = $this->strpaddecbin2str($str,2,8);
-        debmes("DateUntil:".$hilf["DateUntil"], 'eq3max');
-	$rec['DATEUNTIL']=$hilf["DateUntil"];
 
-        $hilf["RFAdress"] = $this->strpaddechex2str($str, 3, 2);  
-        $hilf["Status"] = $this->strpaddecbin2str($str,6,1);
-        debmes("Status:".$hilf["Status"], 'eq3max');
-	$rec['STATUS']=$hilf["Status"];
+      debmes("MODE:".$data2[6].$data2[7], 'eq3max');
 
-//      $hilf["SetpointTemp"] = $this->ord2str($str, 8)/2;  
-//        debmes("SetpointTemp:".$hilf["SetpointTemp"], 'eq3max');
+switch ($data2[6].$data2[7]) {
+//00=auto/week schedule  
+//01=Manual              
+//10=Vacation            
+//11=Boost               
 
 
 
-//$this->pos = $this->pos - 2;
-//$hilf["DateUntil1"] = $this->strpaddecbin2str($str,1,8);
-//$hilf["DateUntil2"] = $this->strpaddecbin2str($str,1,8);
-        $hilf["TimeUntil"] =  $this->ord2str($str, 1);
-        debmes("TimeUntil:".$hilf["TimeUntil"], 'eq3max');
-	$rec['TIMEUNTIL']=$hilf["TimeUntil"];
+	   case "00":
+	   $rec['MODE']='auto';
+           debmes("MODE:auto", 'eq3max');
+	   break;
+
+	   case "01":
+           debmes("MODE:manual", 'eq3max');
+	   $rec['MODE']='manual';
+	   break;
+
+	   case "10":
+           debmes("MODE:vacation", 'eq3max');
+	   $rec['MODE']='vacation';
+	   break;
+
+	   case "11":
+           debmes("MODE:boost", 'eq3max');
+	   $rec['MODE']='boost';
+	   break;
+
+
+}
+
+//                          bit 3     DST setting   0=inactive,1=active
+      debmes("VALID:".$data2[4], 'eq3max');
+switch ($data2[4]) {
+
+	   case "1":
+	   $rec['DSTSET']='active';
+          debmes("DSTSET:active", 'eq3max');
+	   break;
+
+	   case "0":
+	   $rec['DSTSET']='inactive';
+          debmes("DSTSET:inactive", 'eq3max');
+	   break;
+}
+
+
+//                          bit 4     Gateway       0=unknown,1=known
+      debmes("GATEWAY:".$data2[3], 'eq3max');
+switch ($data2[3]) {
+
+	   case "1":
+	   $rec['GATEWAY']='known';
+          debmes("GATEWAY:known", 'eq3max');
+	   break;
+
+	   case "0":
+	   $rec['GATEWAY']='unknown';
+          debmes("GATEWAY:unknown", 'eq3max');
+	   break;
+}
+
+
+//bit 7     Battery       1=Low
+      debmes("BATTERY:".$data2[1], 'eq3max');
+switch ($data2[3]) {
+
+	   case "1":
+          debmes("BATTERY:Low", 'eq3max');
+	   $rec['BATTERY']='Low';
+	   break;
+
+	   case "0":
+          debmes("BATTERY:Good", 'eq3max');
+	   $rec['BATTERY']='Good';
+	   break;
+}
+
+
+
+
+
+
+//      $hilf["Data2"] = $this->strpaddecbin2str($str,1,8);
+//      debmes("Data2:".$hilf["Data2"], 'eq3max');
+
+      $valve=substr($tempstr,14,2);
+        debmes("ValvePosition:".$valve, 'eq3max');
+	$rec['VALVEPOSITION']=$valve;
+
+        $temp=hexdec(substr($tempstr,16,2))/2;
+        debmes("Temperature:".$temp, 'eq3max');
+	$rec['TEMPERATURE']=$temp;
 
        $rec['UPDATED']=date('Y-m-d H:i:s');
 
+
+
+
+
+
+
+//        ltrim($bin, $length);
+
+debmes($rec, 'eq3max');
 	if ($rec['ID']) {
+debmes('SQLUpdate', 'eq3max');
+       $rec['UPDATED']=date('Y-m-d H:i:s');
 	SQLUpdate('eq3max_devices', $rec);
 	} else 
 	{
-	SQLInsert('eq3max_devices', $rec);
+debmes('SQLInsert', 'eq3max');
+if ($rec['RFADDRESS'])	
+{SQLInsert('eq3max_devices', $rec);
+    $rec['UPDATED']=date('Y-m-d H:i:s');
+}
 	}
 
-
-
-      }
+}
+}
+      
+/*
 
       if (!isset($this->retarr["devc"])){
       	$this->retarr["devc"]=array();
@@ -1046,7 +1225,7 @@ B       1     2E          Time until (23:00) (see Encoding/Decoding date/time)
         case "10" : $this->retarr["devc"][$key]["lMode"] = "vacation"; break;
         case "11" : $this->retarr["devc"][$key]["lMode"] = "boost"; break;
       }
-	$rec['MODE']=$key.":".$this->retarr["devc"][$key]["lMode"];
+	$rec['MODE']=$this->retarr["devc"][$key]["lMode"];
 	debmes("mode:".$key.":".$this->retarr["devc"][$key]["lMode"], 'eq3max');
  
     }
@@ -1064,8 +1243,8 @@ B       1     2E          Time until (23:00) (see Encoding/Decoding date/time)
 
 
 
-}
 
+*/
 }
 
 
@@ -1102,7 +1281,7 @@ B       1     2E          Time until (23:00) (see Encoding/Decoding date/time)
     }
     if ( (!ctype_digit($temp)) or ( ($strrem<>"") and ($strrem<>".5") ) ) {
   	   $this->retarr["err"][]= "The temperature value is not a valid number. Only halve or whole digits allowed . For example 17 or 17.0 or 17.5";   
-    }
+    }                                           	
     $temp=$temp . $strrem;
     if ($this->retarr["err"]=="") {	
       if (  ($temp>30) or ($temp<0) ) {
@@ -1538,6 +1717,15 @@ function set_favorit($id, $color) {
  eq3max_devices: SETMODE varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: STATUS varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: UPDATED datetime
+ eq3max_devices: INITIALIZED varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: ANSWER varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: ERROR varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: VALID varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: DSTSET varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: GATEWAY varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: BATTERY varchar(100) NOT NULL DEFAULT ''
+
+
                
 
 
