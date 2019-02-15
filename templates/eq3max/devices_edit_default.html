@@ -14,6 +14,14 @@
 		<legend><#LANG_ADD#> <#LANG_DEVICE#></legend>
 		[#endif ID#]
 
+
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_ID#] style="color:red;font-weight:bold"[#endif#]>
+				ID (*):
+			</label>
+			<div class="col-lg-4"><input type="text" class="form-control" name="id" value="[#ID#]" id="id"disabled></div>
+		</div>
+
 		<div class="form-group">
 			<label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
 				<#LANG_TITLE#> (*):
@@ -23,44 +31,332 @@
 
 		<div class="form-group">
 			<label class="col-lg-3 control-label"[#if ERR_IP#] style="color:red;font-weight:bold"[#endif#]>
-				IP (*):
+				RFADDRESS  (*):
 			</label>
-			<div class="col-lg-4"><input type="text" class="form-control" name="ip" value="[#IP#]" id="ip"></div>
+			<div class="col-lg-4"><input type="text" class="form-control" name="rfaddress" value="[#RFADDRESS#]" id="rfaddress" disabled></div>
 		</div>
 
 
-		[#if TITLE!=""#]
+
+
+
+
+
+
+		[#if DEVICETYPETEXT !=""#]
 		<div class="form-group">
-			<label class="col-lg-3 control-label">
-				Модель:
+			<label class="col-lg-3 control-label"[#if ERR_DEVICETYPETEXT#] style="color:red;font-weight:bold"[#endif#]>
+				DEVICETYPE :
 			</label>
-			<div class="col-lg-4">[#TITLE#]</div>
+		<div class="col-lg-4"><input type="text" class="form-control" name="devicetypetext" value="[#DEVICETYPETEXT#]" id="devicetypetext" disabled></div>
 		</div>
 		[#endif#]
 
-		[#if DEVICE_TYPE_CODE!=""#]
+		[#if SERIALNUMBER !=""#]
 		<div class="form-group">
-			<label class="col-lg-3 control-label">
-				<#LANG_CODE#>:
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				SERIALNUMBER :
 			</label>
-			<div class="col-lg-4">[#DEVICE_TYPE_CODE#]</div>
+		<div class="col-lg-4"><input type="text" class="form-control" name="serialnumber" value="[#SERIALNUMBER#]" id="serialnumber" disabled></div>
 		</div>
 		[#endif#]
 
-		[#if MAC!=""#]
+		[#if DEVICENAME !=""#]
 		<div class="form-group">
-			<label class="col-lg-3 control-label"[#if ERR_MAC#] style="color:red;font-weight:bold"[#endif#]>
-				MAC:
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				DEVICENAME :
 			</label>
-			<div class="col-lg-4">[#MAC#]</div>
+		<div class="col-lg-4"><input type="text" class="form-control" name="devicename" value="[#DEVICENAME#]" id="devicename" disabled></div>
 		</div>
 		[#endif#]
-		
 
-		
+		[#if BATTERY!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				BATTERY :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#BATTERY#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if TEMPERATURE!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				TEMPERATURE :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#TEMPERATURE#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if MODE!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				MODE :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#MODE#]" id="" disabled></div>
+		</div>
+		[#endif#]
 
 
-		
+
+
+		[#if FIRMWARE!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				FIRMWARE :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#FIRMWARE#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if ECOTEMP!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				ECOTEMP :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#ECOTEMP#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if MINSETPOINTTEMP!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				MINSETPOINTTEMP :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#MINSETPOINTTEMP#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if WINDOWOPENDURATION!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				WINDOWOPENDURATION :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#WINDOWOPENDURATION#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if BOOST!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				BOOST :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#BOOST#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if BOOSTVALUE!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				BOOSTVALUE :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#BOOSTVALUE#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if WINDOWOPENTEMP!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				WINDOWOPENTEMP :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#WINDOWOPENTEMP#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if BOOSTDURATION!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				BOOSTDURATION :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#BOOSTDURATION#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if DECALC!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				DECALC :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#DECALC#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if MAXVALVESETING!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				MAXVALVESETING :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#MAXVALVESETING#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if VALVEOFFSET!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_VALVEOFFSET#] style="color:red;font-weight:bold"[#endif#]>
+				VALVEOFFSET :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#VALVEOFFSET#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if NUMMODUS!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				NUMMODUS :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#NUMMODUS#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+
+		[#if VALVEPOSITION!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				VALVEPOSITION :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#VALVEPOSITION#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+
+
+
+		[#if DATEUNTIL!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				DATEUNTIL :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#DATEUNTIL#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+
+		[#if TIMEUNTIL!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				TIMEUNTIL :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#TIMEUNTIL#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+
+
+
+		[#if SETPOINTTEMP!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				SETPOINTTEMP :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#SETPOINTTEMP#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if SETMODE!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				SETMODE :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#SETMODE#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if STATUS!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				STATUS :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#STATUS#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if UPDATED!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				UPDATED  :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#UPDATED#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if INITIALIZED!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				INITIALIZED :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#INITIALIZED#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if ANSWER!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				ANSWER :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#ANSWER#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+
+		[#if ERROR!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				ERROR  :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#ERROR#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+
+		[#if VALID!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				VALID :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#VALID#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if DSTSET!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				DSTSET :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#DSTSET#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if GATEWAY!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				GATEWAY :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#GATEWAY#]" id="" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if DEVICETYPE !=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_DEVICETYPE#] style="color:red;font-weight:bold"[#endif#]>
+				DEVICETYPE :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="devicetype" value="[#DEVICETYPE#]" id="devicetype" disabled></div>
+		</div>
+		[#endif#]
+
+		[#if ROOMID!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				ROOMID :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="roomid" value="[#ROOMID#]" id="roomid" disabled></div>
+		</div>
+		[#endif#]
+
+
+
+
+	
 		<div class="form-group">
 			<div class="col-lg-offset-3 col-lg-4">
 				[#if ID!=""#]
@@ -81,6 +377,6 @@
 </form>
 
 </td><td>
-<img src="../img/modules/[#TITLE#].png" width="400">
+<img src="../templates/eq3max/img/[#DEVICETYPETEXT#].jpg" width="400">
 </td></tr></table>
 
