@@ -6,7 +6,9 @@
    $out['CONTROLPANEL']=1;
   }
   $table_name='eq3max_devices';
-  $rec=SQLSelectOne("SELECT * FROM $table_name WHERE ID='$id'");
+$sql="SELECT * FROM $table_name WHERE ID='$id'";
+debmes( $sql, 'eq3max');
+  $rec=SQLSelectOne($sql);
   if ($this->mode=='update') {
    $ok=1;
   // step: default
