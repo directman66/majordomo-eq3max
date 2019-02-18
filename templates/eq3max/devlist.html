@@ -18,6 +18,7 @@
  <td><b>SN</b></td>
  <td><b>SETPONT</b></td>
  <td><b>ACTUALTEMP</b></td>
+  <td><b>VALVE</b></td>
  <td><b>BATTERY</b></td>
 
 <td><b>UPDATED</b></td>
@@ -90,6 +91,13 @@
 [#endif#]
 </td>
   <td>[#ACTUALTEMP#]</td>
+  <td>
+[#if DEVICETYPETEXT='Thermostat'#]
+[#VALVEPOSITION#]
+[#endif#]
+
+</td>
+
   <td>[#BATTERY#]</td>
 <td>[#UPDATED#]</td>
 
