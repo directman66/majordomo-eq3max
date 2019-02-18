@@ -1208,6 +1208,7 @@ switch ($data2[1]) {
 
      if ($rec['LINKED_OBJECT'] && $rec['LINKED_PROPERTY'])  {
      setglobal($rec['LINKED_OBJECT'].".".$rec['LINKED_PROPERTY'],$temp, array($this->name=>'0') );
+        debmes("setglobal(".$rec['LINKED_OBJECT'].".".$rec['LINKED_PROPERTY'].",".$temp.")", 'eq3max');
 }
 
 
@@ -1223,7 +1224,11 @@ if ($atemp!=0)
 
      if ($rec['LINKED_OBJECT2'] && $rec['LINKED_PROPERTY2'])  {
      setglobal($rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'],$atemp, array($this->name=>'0') );
+        debmes("setglobal(".$rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'].",".$atemp.")", 'eq3max');
 }
+
+   debmes("getglobal(".$rec['LINKED_OBJECT'].".".$rec['LINKED_PROPERTY'].":".getglobal($rec['LINKED_OBJECT'].".".$rec['LINKED_PROPERTY']), 'eq3max');
+   debmes("getglobal(".$rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'].":".getglobal($rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2']), 'eq3max');
 
 }
 
@@ -1239,6 +1244,7 @@ $rec['ACTUALTEMP']=$atemp;
 
      if ($rec['LINKED_OBJECT2'] && $rec['LINKED_PROPERTY2'])  {
      setglobal($rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'],$atemp, array($this->name=>'0') );
+        debmes("setglobal(".$rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'].",".$atemp, 'eq3max');
 }
 
 
@@ -1525,8 +1531,8 @@ debmes('Сработал propertySetHandle object:'.$object." property:". $prope
 $sql="SELECT * FROM eq3max_devices WHERE LINKED_OBJECT LIKE '".DBSafe($object)."' AND LINKED_PROPERTY LIKE '".DBSafe($property)."'";
 debmes($sql, 'eq3max');
 
-
-
+if (!$value) { debmes('value не содержит данных', 'eq3max'); } else 
+{
 
    $rec=SQLSelect($sql);
    $total=count($rec);
@@ -1573,6 +1579,7 @@ debmes("задача get выполнена", "eq3max");
 
     }
    }  
+}
  }
 
 
@@ -1580,7 +1587,7 @@ debmes("задача get выполнена", "eq3max");
 
    
 function edit_devices(&$out, $id) {
-debmes('rum '.DIR_MODULES.$this->name . '/eq3max_devices_edit.inc.php', 'eq3max');
+debmes('run '.DIR_MODULES.$this->name . '/eq3max_devices_edit.inc.php', 'eq3max');
 require(DIR_MODULES.$this->name . '/eq3max_devices_edit.inc.php');
 }
 
