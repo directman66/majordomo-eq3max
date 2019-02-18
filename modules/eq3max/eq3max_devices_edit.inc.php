@@ -39,6 +39,13 @@ debmes('$this->tab:'.$this->tab, 'eq3max');
    global $linked_property;
    $rec['LINKED_PROPERTY']=$linked_property;
 
+
+   global $linked_object2;
+   $rec['LINKED_OBJECT2']=$linked_object2;
+   global $linked_property2;
+   $rec['LINKED_PROPERTY2']=$linked_property2;
+
+
 debmes('linked_object:'.$linked_object.' linked_property:'.$linked_property, 'eq3max');
 
 }
@@ -53,6 +60,14 @@ debmes('linked_object:'.$linked_object.' linked_property:'.$linked_property, 'eq
      if ($rec['LINKED_OBJECT'] && $rec['LINKED_PROPERTY'])  {
     addLinkedProperty($rec['LINKED_OBJECT'], $rec['LINKED_PROPERTY'], $this->name);
 }
+
+      if (!$rec['LINKED_OBJECT2'] && !$rec['LINKED_PROPERTY2'])  {
+    removeLinkedProperty($old_linked_object, $old_linked_property, $this->name);
+}
+     if ($rec['LINKED_OBJECT2'] && $rec['LINKED_PROPERTY2'])  {
+    addLinkedProperty($rec['LINKED_OBJECT2'], $rec['LINKED_PROPERTY2'], $this->name);
+}
+
 
 
 }
