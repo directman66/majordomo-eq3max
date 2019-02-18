@@ -86,6 +86,29 @@
 			</label>
 		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#TEMPERATURE#]" id="" disabled></div>
 		</div>
+
+<hr>
+
+<!-- LINKED_OBJECT (varchar) -->
+<div class="form-group">
+ <label class="col-lg-3 control-label"[#if ERR_LINKED_OBJECT#] style="color:red;font-weight:bold"[#endif#]>
+ <#LANG_LINKED_OBJECT#>:
+ </label>
+ <div class="col-lg-4"><input type="text" class="form-control" name="linked_object" value="[#LINKED_OBJECT#]" id="linked_object"></div>
+</div>
+<!-- LINKED_PROPERTY (varchar) -->
+<div class="form-group">
+ <label class="col-lg-3 control-label"[#if ERR_LINKED_PROPERTY#] style="color:red;font-weight:bold"[#endif#]>
+ <#LANG_LINKED_PROPERTY#>:
+ </label>
+ <div class="col-lg-4"><input type="text" class="form-control" name="linked_property" value="[#LINKED_PROPERTY#]" id="linked_property"></div>
+</div>
+
+
+[#module name="linkedobject" object_field="linked_object" property_field="linked_property" method_field="linked_method"#]
+
+
+<hr>
 		[#endif#]
 
 		[#if MODE!=""#]
@@ -366,8 +389,9 @@
 				[#endif ID#]
 				<a href="?data_source=<#DATA_SOURCE#>" class="btn btn-default "><#LANG_STRING_BACK#></a>
 				<input type="hidden" name="id" value="<#ID#>">
-				<input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
-				<input type="hidden" name="edit_mode" value="<#EDIT_MODE#>">
+
+				<input type="hidden" name="edit_mode" value="edit_devices">
+				<input type="hidden" name="view_mode" value="edit_devices">
 				<input type="hidden" name="mode" value="update">
 				<input type="hidden" name="data_source" value="<#DATA_SOURCE#>">
 				<input type="hidden" name="tab" value="<#TAB#>">
