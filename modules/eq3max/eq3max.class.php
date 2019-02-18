@@ -1205,23 +1205,44 @@ switch ($data2[1]) {
         debmes("Temperature:".$temp, 'eq3max');
 	$rec['TEMPERATURE']=$temp;
 
+
+     if ($rec['LINKED_OBJECT'] && $rec['LINKED_PROPERTY'])  {
+     setglobal($rec['LINKED_OBJECT'].".".$rec['LINKED_PROPERTY'],$temp, array($this->name=>'0') );
+}
+
+
        $rec['UPDATED']=date('Y-m-d H:i:s');
 
 if ($lenght==12) {
 //base_convert(substr($tempstr,10,2), 16, 2)
         $atemp=base_convert(substr(base_convert(substr($tempstr,18,2),16,2),-1).base_convert(substr($tempstr,20,2),16,2),2,10)/10;
-if ($atemp!=0)   debmes("ACTUALTEMP:".$atemp, 'eq3max');
+if ($atemp!=0)   
+{debmes("ACTUALTEMP:".$atemp, 'eq3max');
 //	$rec['DEBUG']=substr(base_convert(substr($tempstr,18,2),16,2),-1).base_convert(substr($tempstr,20,2),16,2);
 	$rec['ACTUALTEMP']=$atemp;
+
+     if ($rec['LINKED_OBJECT2'] && $rec['LINKED_PROPERTY2'])  {
+     setglobal($rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'],$atemp, array($this->name=>'0') );
+}
+
+}
+
 
 }
 
 if ($lenght==13) {
         $atemp=base_convert(substr(base_convert(substr($tempstr,16,2),16,2),1,1).base_convert(substr($tempstr,24,2),16,2),2,10)/10;
         debmes("ACTUALTEMP:".$atemp, 'eq3max');
-if ($atemp!=0) 	$rec['ACTUALTEMP']=$atemp;
+if ($atemp!=0) 	{
+$rec['ACTUALTEMP']=$atemp;
 //	$rec['DEBUG']=substr(base_convert(substr($tempstr,16,2),16,2),1,1).base_convert(substr($tempstr,24,2),16,2);
 
+     if ($rec['LINKED_OBJECT2'] && $rec['LINKED_PROPERTY2'])  {
+     setglobal($rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'],$atemp, array($this->name=>'0') );
+}
+
+
+}
 }
 
 
@@ -1857,6 +1878,8 @@ function set_favorit($id, $color) {
  eq3max_devices: BATTERY varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: LINKED_OBJECT varchar(255) NOT NULL DEFAULT ''
  eq3max_devices: LINKED_PROPERTY varchar(255) NOT NULL DEFAULT ''
+ eq3max_devices: LINKED_OBJECT2 varchar(255) NOT NULL DEFAULT ''
+ eq3max_devices: LINKED_PROPERTY2 varchar(255) NOT NULL DEFAULT ''
  eq3max_devices: LINKED_METHOD varchar(255) NOT NULL DEFAULT ''
 
 
