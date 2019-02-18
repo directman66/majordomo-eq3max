@@ -78,16 +78,16 @@
 		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#BATTERY#]" id="" disabled></div>
 		</div>
 		[#endif#]
-
+<hr>
 		[#if TEMPERATURE!=""#]
 		<div class="form-group">
 			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
-				TEMPERATURE :
+				TARGET TEMPERATURE (read, write) :
 			</label>
 		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#TEMPERATURE#]" id="" disabled></div>
 		</div>
 
-<hr>
+
 
 <!-- LINKED_OBJECT (varchar) -->
 <div class="form-group">
@@ -106,6 +106,40 @@
 
 
 [#module name="linkedobject" object_field="linked_object" property_field="linked_property" method_field="linked_method"#]
+
+
+<hr>
+		[#endif#]
+
+
+
+		[#if ACTUALTEMP!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_SERIALNUMBER#] style="color:red;font-weight:bold"[#endif#]>
+				ACTUALTEMP (read only) :
+			</label>
+		<div class="col-lg-4"><input type="text" class="form-control" name="" value="[#ACTUALTEMP#]" id="" disabled></div>
+		</div>
+
+
+
+<!-- LINKED_OBJECT (varchar) -->
+<div class="form-group">
+ <label class="col-lg-3 control-label"[#if ERR_LINKED_OBJECT#] style="color:red;font-weight:bold"[#endif#]>
+ <#LANG_LINKED_OBJECT#>:
+ </label>
+ <div class="col-lg-4"><input type="text" class="form-control" name="linked_object2" value="[#LINKED_OBJECT2#]" id="linked_object2"></div>
+</div>
+<!-- LINKED_PROPERTY (varchar) -->
+<div class="form-group">
+ <label class="col-lg-3 control-label"[#if ERR_LINKED_PROPERTY#] style="color:red;font-weight:bold"[#endif#]>
+ <#LANG_LINKED_PROPERTY#>:
+ </label>
+ <div class="col-lg-4"><input type="text" class="form-control" name="linked_property2" value="[#LINKED_PROPERTY2#]" id="linked_property2"></div>
+</div>
+
+[#module name="linkedobject" object_field="linked_object2" property_field="linked_property2" method_field="linked_method2"#]
+
 
 
 <hr>
