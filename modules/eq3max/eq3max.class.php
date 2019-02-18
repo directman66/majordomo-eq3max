@@ -887,11 +887,69 @@ L: CwA1CAASGiAshYsu
 
     0b 18 f6 21 09 12 18 00 0a 00 00 00               0b длинна 11 байт RF=18f621  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
     0c 17 71 90 09 12 18 04 0a 00 00 00	f9	      0c длинна 12 байт RF=177190  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 4% 5gr
+    0c 17 71 90 09 12 18 04 2a 32 13 29 f7
+      0a& 0x80 +f9
+      2a  f f7  = 24.7
+(data[pos + 8] & 0x80) << 1) + data[pos + 12]) / 10.0
+
     0b 18 f6 04 09 12 18 00 0a 00 00 00               f9 длинна 11 байт RF=18f604  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
     0b 18 4a f3 09 12 18 00 0a 00 00 00	              0b длинна 11 байт RF=184af3  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
     0b 18 f6 14 09 12 18 00 0a 00 00 00               0b длинна 11 байт RF=18f614  09? 12= 00010010b(Valid, Initialized) 18 = 00011000b (00 auto,  1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
     0b 18 f7 1e f1 12 19 00 0a 00 00 00               0b длинна 11 байт RF=18f71e  f1? 12= 00010010b(Valid, Initialized) 19 = 00011001b (01 manual,1 DST active, 1 Gateway known, 0 Panel unlocked, Linkstatus OK,Battery OK)  valve 0% 5gr
-    
+    0b 18 f7 1e 03 1a 1a 00 2a 32 13 29
+    0b 18 f6 14 09 12 18 0b 2a 00 e3 00
+    0b 18 f7 1e 03 1a 18 00 2a 00 00 00
+            1001 + 00 = 100 = 64 /10 = 6.4
+              101010 110010 = 110010 = 5
+
+
+
+
+
+0b 18 f6 21 09 12 18 00 2a 00 00 00  
+0c 17 71 90 09 12 18 04 2a 32 13 29 f7   24.7
+0b 18 f6 04 09 12 18 00 2a 00 00 00  
+0b 18 4a f3 09 12 18 00 2a 00 ea 00  23.2      ea = 11101010 = 234/10 = 23.4
+0b 18 f6 14 09 12 18 09 2a 00 e5 00  22.8      e5 = 11100101 = 229/10=22.9
+0b 18 f7 1e 03 1a 18 00 2a 00 00 00 
+0b 18 f6 21 09 12 18 00 2a 00 00 00   
+0c 17 71 90 09 12 18 04 2a 32 13 29 f7
+0b 18 f6 04 09 12 18 00 2a 00 00 00  
+0b 18 4a f3 09 12 18 00 2a 00 ea 00   23.4
+0b 18 f6 14 09 12 18 09 2a 00 e5 00   22.9
+0b 18 f7 1e 03 1a 18 00 2a 00 00 00  
+
+32 13 = 110010 10011 = 010011 = 19
+
+
+    ((data[pos + 9] & 0xFF) * 256 + (data[pos + 10] & 0xFF)) / 10.0
+    42*256/10
+
+
+
+thermostat
+
+9       Actual Temperature  2           205
+
+offset|      9    | ... |      10    |
+hex   |     01    |     |     32    |
+binary| 0000 0001 | ... | 0011 0010 |
+                |         |||| ||||
+                +---------++++-++++--- actual temperature (°C*10): 100110010 = 30.6°C
+
+
+Фактическая температура (настенный термостат)
+11      Actual Temperature  1           219
+Температура в помещении измеряется настенным термостатом в ° C * 10. Например, 0xDB = 219 = 21,9 ° C Температура представлена ​​9 битами; 9-й бит доступен как верхний бит со смещением 8
+
+offset|      8    | ... |     12    |
+hex   |     B2    |     |     24    |
+binary| 1011 0010 | ... | 0010 0100 |
+        | || ||||         |||| ||||
+        | ++-++++--------------------- temperature (°C*2):            110010 = 25.0°C
+        |                 |||| ||||
+        +-----------------++++-++++--- actual temperature (°C*10): 100100100 = 29.2°C
+
 
 КОДє ВЫБРАТЬ ВСЕ
 Start Length  Value       Description
@@ -972,15 +1030,19 @@ debmes("стало: ".$bin  , 'eq3max');
 //      debmes("ReadLength:".substr($bin,1,2).":" .$hilf["ReadLength"], 'eq3max');
 
       debmes("Readstring:".$tempstr, 'eq3max');
+      debmes($tempstr, 'eq3max_debug');
+
+
 $rfadress=substr($tempstr,2,6);
 //      $hilf["RFAdress"] = $this->strpaddechex2str($str, 3, 2);  
       debmes("RFAdress:".$rfadress, 'eq3max');
 
 
+
 	$rec=SQLSelectOne("SELECT * FROM eq3max_devices where RFADDRESS='".$rfadress."'");
 //	$rec['RFADDRESS']=$hilf["RFAdress"];
 	$rec['RFADDRESS']=$rfadress;
-
+        $rec['DEBUG']=$tempstr;
       $hilf["?1"] = $this->dechex2str($str, 1);
       debmes("?1:".$hilf["?1"], 'eq3max');
 
@@ -1114,7 +1176,7 @@ switch ($data2[3]) {
 
 //bit 7     Battery       1=Low
       debmes("BATTERY:".$data2[1], 'eq3max');
-switch ($data2[3]) {
+switch ($data2[1]) {
 
 	   case "1":
           debmes("BATTERY:Low", 'eq3max');
@@ -1144,6 +1206,24 @@ switch ($data2[3]) {
 	$rec['TEMPERATURE']=$temp;
 
        $rec['UPDATED']=date('Y-m-d H:i:s');
+
+if ($lenght==12) {
+//base_convert(substr($tempstr,10,2), 16, 2)
+        $atemp=base_convert(substr(base_convert(substr($tempstr,18,2),16,2),-1).base_convert(substr($tempstr,20,2),16,2),2,10)/10;
+if ($atemp!=0)   debmes("ACTUALTEMP:".$atemp, 'eq3max');
+//	$rec['DEBUG']=substr(base_convert(substr($tempstr,18,2),16,2),-1).base_convert(substr($tempstr,20,2),16,2);
+	$rec['ACTUALTEMP']=$atemp;
+
+}
+
+if ($lenght==13) {
+        $atemp=base_convert(substr(base_convert(substr($tempstr,16,2),16,2),1,1).base_convert(substr($tempstr,24,2),16,2),2,10)/10;
+        debmes("ACTUALTEMP:".$atemp, 'eq3max');
+if ($atemp!=0) 	$rec['ACTUALTEMP']=$atemp;
+//	$rec['DEBUG']=substr(base_convert(substr($tempstr,16,2),16,2),1,1).base_convert(substr($tempstr,24,2),16,2);
+
+}
+
 
 
 
@@ -1768,6 +1848,8 @@ function set_favorit($id, $color) {
  eq3max_devices: UPDATED datetime
  eq3max_devices: INITIALIZED varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: ANSWER varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: DEBUG varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: ACTUALTEMP varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: ERROR varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: VALID varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: DSTSET varchar(100) NOT NULL DEFAULT ''
