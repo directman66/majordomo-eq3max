@@ -185,6 +185,17 @@ SQLExec("update eq3max_devices set SETPOINTTEMP='".$setpointtemp."', setmode='".
 $this->SetTemp($rfaddr,$roomid, $selectmode,$setpointtemp);
 
 
+$cmd='
+include_once(DIR_MODULES . "eq3max/eq3max.class.php");
+$eq3 = new eq3max();
+$eq3->get(); 
+debmes("задача get выполнена", "eq3max");
+';
+ SetTimeOut('eq3max_getvalues',$cmd, '1'); 
+
+
+
+
 //   $this->search_devices($out);
 }  
 
@@ -202,13 +213,13 @@ $this->delete_once($this->id);
 }  
 
   if ($this->view_mode=='edit_devices') {
+
+debmes('$this->view_mode:'.$this->view_mode, 'eq3max');
    $this->edit_devices($out, $this->id);
+
+//   $this->redirect("?view_mode=edit_devices&id=".$this->id."&tab=edit_device");
+
     }
-
-
-
-
-
 
 
 
@@ -1393,52 +1404,82 @@ debmes('Закрыли сокет, обмен закончен', 'eq3max');
 
 
 
-
+debmes($this->retarr, 'eq3max');
     return $this->retarr; 
   }
 
 
 
-
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
 
 
  function propertySetHandle($object, $property, $value) {
 
-$sql="SELECT eq3max_commands.* FROM eq3max_commands WHERE eq3max_commands.LINKED_OBJECT LIKE '" . DBSafe($object) . "' AND eq3max_commands.LINKED_PROPERTY LIKE '" . DBSafe($property) . "'";
-//sg('test.sql',$sql);
 
-     $properties = SQLSelect($sql);
-     $total = count($properties);
-     if ($total) {
-
-         for ($i = 0; $i < $total; $i++) {
-$sql="SELECT * FROM eq3max_devices WHERE ID=".(int)$properties[$i]['DEVICE_ID'];
-//sg('test.sql2',$sql);
-             $device=SQLSelectOne($sql);
-             $host=$device['IP'];
-
-	     $deviceid=$device['ID'];
-             $type=$device['MODEL']; //0 = white, 1 = rgb
-             $command=$properties[$i]['TITLE'];
-             $meth=$properties[$i]['LINKED_METHOD'];
-             $state=$properties[$i]['VALUE'];             
-             $magichomeObject = new magichome();
-             $properties[$i]['VALUE']=$value;
-             $properties[$i]['UPDATED']=date('Y-m-d H:i:s');
+debmes('Сработал propertySetHandle object:'.$object." property:". $property." value:". $value,  'eq3max');
+$sql="SELECT * FROM eq3max_devices WHERE LINKED_OBJECT LIKE '".DBSafe($object)."' AND LINKED_PROPERTY LIKE '".DBSafe($property)."'";
+debmes($sql, 'eq3max');
 
 
-             SQLUpdate('eq3max_commands',$properties[$i]);	
+
+
+   $rec=SQLSelect($sql);
+   $total=count($rec);
+
+debmes($object.":". $property.":". $value. ' найдено результатов '. $total, 'eq3max');
+
+   if ($total) {
+    for($i=0;$i<$total;$i++) {
+
+//проверяем тип устройства
+
+
+
+$tip=$rec[$i]['DEVICETYPETEXT'];
+$rfaddress=$rec[$i]['RFADDRESS'];
+$roomid=$rec[$i]['ROOMID'];
+//$changedprop=$bleprop[$i]['TITLE'];
+
+     debmes('DEVICE_ID:'.$rec[$i]['ID']. '   $rfaddress:'.$rfaddress.' тип. уст:'.$tip.  "  value:".$value, 'eq3max');
+
+if ($tip=='Thermostat') {
+//echo $tip;
+
+     debmes('Отправляем устройству  rfaddr:'.$rfaddress.' тип. уст:'.$tip. 'новое значение:'.$value, 'eq3max');
+
+$this->SetTemp($rfaddress,$roomid, 'manu',$value);
+
+
+$cmd='
+include_once(DIR_MODULES . "eq3max/eq3max.class.php");
+$eq3 = new eq3max();
+$eq3->get(); 
+debmes("задача get выполнена", "eq3max");
+';
+ SetTimeOut('eq3max_getvalues',$cmd, '1'); 
 
 }
+
+
+//нужно проверить, может ли свойство  управляться
+
+
+
+
+    }
+   }  
  }
-
-}
 
 
             
 
    
 function edit_devices(&$out, $id) {
+debmes('rum '.DIR_MODULES.$this->name . '/eq3max_devices_edit.inc.php', 'eq3max');
 require(DIR_MODULES.$this->name . '/eq3max_devices_edit.inc.php');
 }
 
@@ -1603,6 +1644,13 @@ $total = count($commands);
   require(DIR_MODULES.$this->name.'/eq3max_devices_edit.inc.php');
  }
 
+function processSubscription($event_name, $details='') {
+  if ($event_name=='HOURLY') {
+  $this->get();
+  }
+ }	
+
+
 
 
 
@@ -1659,6 +1707,7 @@ function set_favorit($id, $color) {
 * @access private
 */
  function install($data='') {
+  subscribeToEvent($this->name, 'HOURLY');
   parent::install();
  }
 /**
@@ -1724,6 +1773,10 @@ function set_favorit($id, $color) {
  eq3max_devices: DSTSET varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: GATEWAY varchar(100) NOT NULL DEFAULT ''
  eq3max_devices: BATTERY varchar(100) NOT NULL DEFAULT ''
+ eq3max_devices: LINKED_OBJECT varchar(255) NOT NULL DEFAULT ''
+ eq3max_devices: LINKED_PROPERTY varchar(255) NOT NULL DEFAULT ''
+ eq3max_devices: LINKED_METHOD varchar(255) NOT NULL DEFAULT ''
+
 
 
                
