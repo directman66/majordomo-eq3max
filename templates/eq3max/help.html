@@ -1,0 +1,107 @@
+<br/>
+<div class="panel-group" id="accordion">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+		<a data-toggle="collapse" data-parent="#accordion" href="#sms_help">Информация</a>
+		</div>
+		<div class="panel-body collapse" id="sms_help">
+Модуль для управления термостатическими радиаторными головками (TRV) из комплекта eq3-MAX!  
+
+<br>
+<img src="../templates/eq3max/img/eq3-max.jpg" width="400">
+			
+			</br>     </br>
+
+	
+		</div> </div> </div>
+
+
+<div class="panel-group" id="accordion">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+		<a data-toggle="collapse" data-parent="#accordion" href="#nach">Начало работы</a>
+		</div>
+		<div class="panel-body collapse" id="nach">
+		<p>Для начала работы необходимо ввести вручную ip адрес контроллера eq3-max cube в настройках модуля, сохранить данные, после чего нажать кнопку GET.  Эта процедура запустит основной цикл и обновит
+ перечень устройств. <br><br>
+
+Для корректного управления режимом работы с помощью MajorDoMo, 
+рекомендуется целевую температуру привязывать к Простым устройствам "Термостат", например объекту Thermostat01 и свойству currentTargetValue. Режим работы TRV - manual.
+В таком случае TRV будут реагировать на переход в экономный режим, если он настроен в системе.
+		</div> </div> </div>
+
+<div class="panel-group" id="accordion">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+		<a data-toggle="collapse" data-parent="#accordion" href="#vozm">Возможности</a>
+		</div>
+		<div class="panel-body collapse" id="vozm">
+
+
+В настоящее время реализовано:</br>
+1) Получение списка оборудования, подключенного к кубу</br>
+2) Изменение режима работы термостата (auto/manual), установка целевой температуры    </br>
+3) Добавлена привязка целевой температуры (чтение и запись). При изменении целевой температуры автоматически выставляется режим manual. </br>
+4) Вывод текущей температуры в помещении и аналогичная привязка в режиме чтения </br>
+5) Управление режимами manual/auto </br>
+
+		</div> </div> </div>
+
+
+
+<div class="panel-group" id="accordion">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+		<a data-toggle="collapse" data-parent="#accordion" href="#vidget">Управление термостатами из сценариев/методов</a>
+		</div>
+		<div class="panel-body collapse" id="vidget">
+
+Вы можете задать целевую температуру используя следующий код: <br><br>
+
+<b>
+<code>
+include_once(DIR_MODULES . 'eq3max/eq3max.class.php');<br>
+$eq3 = new eq3max();<br>
+$eq3->SetTemp($rfaddr,$roomid, $selectmode,$setpointtemp);</b></code>  <br>
+</code> 			<br>
+где 
+$rfaddr - RF адрес устройства <br>
+$roomid - индекс комнаты <br>
+$selectmode - режим работы TRV (manu,auto,vacation,boost) <br>
+$setpointtemp - целевая температура <br>
+
+<br><br>			
+		</div> </div> </div>
+
+
+
+<div class="panel-group" id="accordion">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+		<a data-toggle="collapse" data-parent="#accordion" href="#cont">Контактная информация</a>
+		</div>
+		<div class="panel-body collapse" id="cont">
+		<p><b>
+<a href="https://github.com/directman66/majordomo-eq3max" target="_blank">Ссылка на репозиторий</a><br>
+<a href="https://mjdm.ru/forum/viewtopic.php?f=5&t=6120" target="_blank">Тема на форуме</a>.<br></b></br>
+		</div> </div> </div>
+
+<div class="panel-group" id="accordion">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+		<a data-toggle="collapse" data-parent="#accordion" href="#bax">Поддержать разработку</a>
+		</div>
+		<div class="panel-body collapse" id="bax">
+
+[#inc rekv.html#]
+
+		</div> </div> </div>
+
+                                                                                                         
+	
+</div>
+
+
+	
+</div>
+
