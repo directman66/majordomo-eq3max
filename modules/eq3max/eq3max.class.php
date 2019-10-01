@@ -1213,12 +1213,13 @@ switch ($data2[1]) {
 
 
        $rec['UPDATED']=date('Y-m-d H:i:s');
+$oldacttemp=$rec['ACTUALTEMP'];
 
 if ($lenght==12) {
 //base_convert(substr($tempstr,10,2), 16, 2)
-        $atemp=base_convert(substr(base_convert(substr($tempstr,18,2),16,2),-1).base_convert(substr($tempstr,20,2),16,2),2,10)/10;
-if ($atemp!=0)   
-{debmes("ACTUALTEMP:".$atemp, 'eq3max');
+     $atemp=base_convert(substr(base_convert(substr($tempstr,18,2),16,2),-1).base_convert(substr($tempstr,20,2),16,2),2,10)/10;
+      if ( ($atemp>=6)&&($atemp<=31))
+       {debmes("ACTUALTEMP:".$atemp, 'eq3max');
 //	$rec['DEBUG']=substr(base_convert(substr($tempstr,18,2),16,2),-1).base_convert(substr($tempstr,20,2),16,2);
 	$rec['ACTUALTEMP']=$atemp;
 
@@ -1231,12 +1232,17 @@ if ($atemp!=0)
    debmes("getglobal(".$rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2'].":".getglobal($rec['LINKED_OBJECT2'].".".$rec['LINKED_PROPERTY2']), 'eq3max');
 
 }
+//else $rec['ACTUALTEMP']='';
 
 
 }
 
-if ($lenght==13) {
-        $atemp=base_convert(substr(base_convert(substr($tempstr,16,2),16,2),1,1).base_convert(substr($tempstr,24,2),16,2),2,10)/10;
+   if ($lenght==13){ 
+   $atemp=base_convert(substr(base_convert(substr($tempstr,16,2),16,2),1,1).base_convert(substr($tempstr,24,2),16,2),2,10)/10;
+
+if  (($atemp>=6)&&($atemp<=31))
+ {
+
         debmes("ACTUALTEMP:".$atemp, 'eq3max');
 if ($atemp!=0) 	{
 $rec['ACTUALTEMP']=$atemp;
@@ -1250,6 +1256,10 @@ $rec['ACTUALTEMP']=$atemp;
 
 }
 }
+//else $rec['ACTUALTEMP']='';
+
+}
+
 
 
 
