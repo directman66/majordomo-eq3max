@@ -1376,6 +1376,16 @@ if ($rec['RFADDRESS'])
 }
 
 
+function SetTempId($id, $imode,$temp){
+$rec=SQLSelectOne('select * from eq3max_devices where id='.$id);
+
+$rfadress=$rec['RFADDRESS'];
+$roomid==$rec['ROOMID'];
+$this->SetTemp($rfadress,$roomid, $imode,$temp);
+
+}
+
+
   function SetTemp($rfadress,$roomid, $imode,$temp){
 
 //echo $rfadress;
