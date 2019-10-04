@@ -62,11 +62,10 @@
 <code>
 include_once(DIR_MODULES . 'eq3max/eq3max.class.php');<br>
 $eq3 = new eq3max();<br>
-$eq3->SetTemp($rfaddr,$roomid, $selectmode,$setpointtemp);</b></code>  <br>
+$eq3->SetTempId($id, $selectmode,$setpointtemp);</b></code>  <br>
 </code> 			<br>
 где 
-$rfaddr - RF адрес устройства <br>
-$roomid - индекс комнаты <br>
+$id  - id номер устройств  <br>
 $selectmode - режим работы TRV (manu,auto,vacation,boost) <br>
 $setpointtemp - целевая температура <br>
 
