@@ -1376,17 +1376,59 @@ if ($rec['RFADDRESS'])
 }
 
 
+
 function SetTempId($id, $imode,$temp){
+
+//debmes('SetTempId', 'eqq3');
+
 $rec=SQLSelectOne('select * from eq3max_devices where id='.$id);
+//debmes($rec, 'eqq3');
 
 $rfadress=$rec['RFADDRESS'];
-$roomid==$rec['ROOMID'];
-$this->SetTemp($rfadress,$roomid, $imode,$temp);
+$roomid=$rec['ROOMID'];
+
+debmes($rfadress.' '.$roomid.' '. $imode.' '.$temp, 'eqq3');
+
+//$this->SetTemp($rfadress,$roomid, $imode,$temp);
+
+
+$cmd='
+include_once(DIR_MODULES . "eq3max/eq3max.class.php");
+$eq3 = new eq3max();
+$eq3->SetTemp("'.$rfadress.'",str_pad('.$roomid.', 2, "0", STR_PAD_LEFT), '.$imode.','.$temp.');
+debmes("задача get выполнена", "eq3max");
+';
+
+debmes($cmd, "eqq3");
+ SetTimeOut('eq3max_setvalues_'.$rfadress,$cmd, '1'); 
+
+
+
+$cmd='
+include_once(DIR_MODULES . "eq3max/eq3max.class.php");
+$eq3 = new eq3max();
+$eq3->get(); 
+debmes("задача get выполнена", "eq3max");
+';
+ SetTimeOut('eq3max_getvalues',$cmd, '5'); 
+
 
 }
 
 
+
+
+
+
+//}
+
+
   function SetTemp($rfadress,$roomid, $imode,$temp){
+
+debmes('SetTemp', 'eqq3');
+debmes('SetTemp:'.$rfadress.' ' .$roomid.' ' . $imode.' ' .$temp, 'eqq3');
+
+debmes('1', 'eqq3');    
 
 //echo $rfadress;
 //echo "-";
@@ -1397,6 +1439,7 @@ $this->SetTemp($rfadress,$roomid, $imode,$temp);
 //echo $temp;
 //echo "<br>";  	
   	$this->retarr["err"]= "";
+$err="";
   	//$command = "00 04 40 00 00 00 00 FE 30 01 A8 8B 8B 1F";
   	
   	$mode=$imode;
@@ -1408,52 +1451,91 @@ $this->SetTemp($rfadress,$roomid, $imode,$temp);
       default: $mode = '01';
     }
 
+debmes('2', 'eqq3');    
+
     $strrem="";
     $pos = strpos($temp, ".");
     if ($pos !== false) {
       $strrem = substr($temp,$pos);
       $temp = substr($temp,0,$pos);
     }
+
+debmes('21', 'eqq3');    
     if ($strrem==".0") {
     	$strrem="";
     }
+
+debmes('22', 'eqq3');    
+
+/*
     if ( (!ctype_digit($temp)) or ( ($strrem<>"") and ($strrem<>".5") ) ) {
-  	   $this->retarr["err"][]= "The temperature value is not a valid number. Only halve or whole digits allowed . For example 17 or 17.0 or 17.5";   
+debmes('222', 'eqq3');    
+//  	   $this->retarr["err"][]= "The temperature value is not a valid number. Only halve or whole digits allowed . For example 17 or 17.0 or 17.5";   
+  $err="The temperature value is not a valid number. Only halve or whole digits allowed . For example 17 or 17.0 or 17.5";
+debmes('The temperature value is not a valid number. Only halve or whole digits allowed . For example 17 or 17.0 or 17.5', 'eqq3');    
+debmes('223', 'eqq3');    
     }                                           	
+*/
+
+
+debmes('23', 'eqq3');    
     $temp=$temp . $strrem;
     if ($this->retarr["err"]=="") {	
       if (  ($temp>30) or ($temp<0) ) {
-  	   $this->retarr["err"][]= "The temperature should be between 0 and 30";   
+//  	   $this->retarr["err"][]= "The temperature should be between 0 and 30";   
+  $err="The temperature should be between 0 and 30";
+debmes('The temperature should be between 0 and 30', 'eqq3');    
       } else {
       	if ($temp<5) {
       		$temp=4;
       	}
       }
     }
+
+debmes('3', 'eqq3');    
     if (strlen($rfadress)<>6) {
-  	  $this->retarr["err"][]= "The rfaddress is not a (hexadecimal) 6 character address";    	
+//  	  $this->retarr["err"][]= "The rfaddress is not a (hexadecimal) 6 character address";    	
+  	  $err= "The rfaddress is not a (hexadecimal) 6 character address";    	
+         debmes('The rfaddress is not a (hexadecimal) 6 character address', 'eqq3');    
     } else {
       if (!ctype_xdigit($rfadress)) {	
-  	    $this->retarr["err"][]= "The rfaddress is not a (hexadecimal) 6 character address";         	
+//  	    $this->retarr["err"][]= "The rfaddress is not a (hexadecimal) 6 character address";         	
+  	    $err= "The rfaddress is not a (hexadecimal) 6 character address";         	
+           debmes('The rfaddress is not a (hexadecimal) 6 character address', 'eqq3');    
       }
     } 
     if (!ctype_digit($roomid))  {
   	   $this->retarr["err"][]= "The roomid is not a valid digit.";   
+  	   $err= "The roomid is not a valid digit.";   
+          debmes('The roomid is not a valid digit.', 'eqq3');    
+
     } else {
       if (  ($roomid>99) or ($roomid<0) ) {
-  	    $this->retarr["err"][]= "Only two digits allowed for roomid";
+//  	    $this->retarr["err"][]= "Only two digits allowed for roomid";
+	    $err= "Only two digits allowed for roomid";
+           debmes('Only two digits allowed for roomid', 'eqq3');    
+
       }  	
     }
-    
-
+debmes('4', 'eqq3');    
+debmes($this->retarr, 'eqq3');
     $deg = strtoupper(dechex(bindec($mode . str_pad(decbin($temp*2),6,"0",STR_PAD_LEFT) )));
+
+debmes($deg.":".$deg, 'eqq3');
+
     //$command = "00 04 40 00 00 00 ".strtoupper($rfadress). str_pad($roomid,2,"0",STR_PAD_LEFT) . $deg."";
     $command = "00 00 40 00 00 00 ".strtoupper($rfadress). str_pad($roomid,2,"0",STR_PAD_LEFT) . $deg."";
     $send = "s:".$this->hex_to_base64(str_replace(" ","",$command))."\r\n";
     //$send = "s:AARAAAAAARf1BHI=\r\n";
+debmes('5', 'eqq3');    
 
+//    if ($this->retarr["err"]=="") {
 
-    if ($this->retarr["err"]=="") {
+debmes($err, 'eqq3');    
+
+    if ($err=="") {
+
+debmes('6', 'eqq3');    
 //$log = date('H:i:s') . " Rfaddress:" . $rfadress . " mode:" . $imode . $mode . " temperature:" . $temp . " command:" . $command . "\n";
 //$handle = fopen('log/weblog_'.date('Y-m-d').'.txt','a');
 //fputs($handle,$log);
@@ -1462,6 +1544,7 @@ $this->SetTemp($rfadress,$roomid, $imode,$temp);
 
 
 debmes("222222222222222222222222222222222222222222222222222222222222222222",'eq3max');
+
   $this->getConfig();
   $host=$this->config['IPADDR'];
   $port = "62910";
